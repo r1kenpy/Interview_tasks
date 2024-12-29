@@ -1,0 +1,1006 @@
+[
+    {
+        "ID": 609,
+        "answers": [
+            {
+                "content": "<p><span style=\"color: rgb(52, 73, 94);\">TransactionalOutbox используется в тех случаях, когда нам нужно атомарно записать событие в очередь сообщений и изменить данные в базе. Возможная реализация: </span></p><ol><li><span style=\"color: rgb(52, 73, 94);\">Создать табличку outbox в той же бд </span></li><li><span style=\"color: rgb(52, 73, 94);\">При записи события в бд, дублировать его в outbox в транзакции </span></li><li><span style=\"color: rgb(52, 73, 94);\">В отдельном процессе читать новые записи с outbox и писать их в очередь</span></li></ol>",
+                "difficulty": "GRADE_18"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:47:58Z",
+        "interviewCount": 2171,
+        "question": "<p>Как гарантированно записать событие в бд и очередь? (TransactionalOutbox)&nbsp;</p><p><br></p><p>Какие гарантии доставки у события до очереди при использовании TransactionalOutbox?</p>",
+        "time": 5,
+        "title": "Как гарантированно записать событие в базу данных и очередь (TransactionalOutbox) "
+    },
+    {
+        "ID": 594,
+        "answers": [
+            {
+                "content": "<p><span style=\"color: rgb(52, 73, 94);\">Монолит (если считать монолитом приложение \"все в одном сервисе\" </span></p><p><span style=\"color: rgb(52, 73, 94);\">Минусы: </span></p><ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">масштабируемость - </span></li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">сложность версионирования (если над ним работает несколько команд) </span></li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">сложность деплоя (если над ним работает несколько команд) - как правило возникает зависимость (тесная) компонентов (хотя с грамотным разграничением доменов этого можно избежать)  </span></li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">большая степень влияния багов одних компонентов на другие </span></li></ol><p><br></p><p><span style=\"color: rgb(52, 73, 94);\">Плюсы: </span></p><ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\"> как правило не требуется межпроцессорное взаимодействие, хотя интеграцию между ограниченными контекстами внутри монолита также можно реализовать как в типичных микросервисных (н-р, с использованием очередей) - </span></li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">проще реализовать атомарные операции между несколькими ограниченными контекстами - </span></li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">как правило нет необходимости в синхронизации данных - </span></li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">проще реализовывать CQRS (поскольку есть доступ к единой бд, как правило) </span></li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span><span style=\"color: rgb(52, 73, 94);\">проще в отладке Сервисная архитектура (если она грамотно организована) решает минусы монолита, но теряет его плюсы. </span></li></ol><p><br></p><p><span style=\"color: rgb(52, 73, 94);\">Микросервисная архитектура это частный случай сервисной архитектуры, который характеризуется еще большим сегментированием сервисов.</span></p>",
+                "difficulty": "GRADE_17"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 641,
+                "title": "Service Communication"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:33:23Z",
+        "interviewCount": 1985,
+        "question": "<p>Чем отличия монолитной/сервисной/микросервисной архитектур?</p>",
+        "time": 5,
+        "title": "Чем отличия монолитной/сервисной/микросервисной архитектур?"
+    },
+    {
+        "ID": 599,
+        "answers": [
+            {
+                "content": "<p><strong style=\"color: rgb(13, 13, 13);\">Command Query Separation, CQS</strong><span style=\"color: rgb(13, 13, 13);\"> - паттерн проектирования, фундаментальная идея которого состоит в том, что методы объекта должны быть </span><u style=\"color: rgb(13, 13, 13);\">либо командами</u><span style=\"color: rgb(13, 13, 13);\"> (изменяющими состояние объекта или системы), </span><u style=\"color: rgb(13, 13, 13);\">либо запросами</u><span style=\"color: rgb(13, 13, 13);\"> (возвращающими информацию о состоянии объекта или системы), </span><u style=\"color: rgb(13, 13, 13);\">но не должны быть и командами, и запросами одновременно</u><span style=\"color: rgb(13, 13, 13);\">.</span></p><p><br></p><p><strong style=\"color: rgb(13, 13, 13);\">Command Query Responsibility Segregation, CQRS </strong><span style=\"color: rgb(13, 13, 13);\">- паттерн проектирования, который основывается на CQS, но идет дальше, разделяя модели данных для операций, модифицирующих данные(Write model), и для операций чтения(Read model). В том числе на физическом уровне.</span></p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:36:21Z",
+        "interviewCount": 1644,
+        "question": "<ol><li>Что такое <span style=\"color: rgb(13, 13, 13);\">Command Query Separation(CQS)?</span></li><li>Что такое Command Query Responsibility Segregation, CQRS?</li><li>Какие методы могут использоваться для синхронизации между моделями?</li><li>В каких случаях применение CQRS оправданно?</li></ol>",
+        "time": 8,
+        "title": " Command Query Responsibility Segregation (CQRS)"
+    },
+    {
+        "ID": 602,
+        "answers": [
+            {
+                "content": "<p><span style=\"color: rgb(52, 73, 94);\">Паттерн разбиения задачи на независимые этапы, каждый из которых может исполняться со своими политиками ретраев и откатов. Главное отличие от распределенной транзакции в том, что каждый этап саги независим и может не иметь представление о других частях саги. Является альтернативой распределенной транзакции.</span></p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 641,
+                "title": "Service Communication"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:39:51Z",
+        "interviewCount": 1469,
+        "question": "<p>Что такое Сага?&nbsp;</p>",
+        "time": 5,
+        "title": "Что такое Сага? "
+    },
+    {
+        "ID": 601,
+        "answers": [
+            {
+                "content": "<p>Кандидат знаком с первыми 3 способами/применял их на практики, но плавает в плюсах/минусах, не имеет опыта выбора форматов или же всегда по-умолчанию выбирает первый вариант</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Кандидат понимает большинство плюсов/минусов:</p><ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>1 способ наиболее удачен в случае обращения к сервисам, которые являются readModel</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>случае же модифицирующих запросов, 2 способ взаимодействие позволяет легче использовать логику retry/rollback, улучшается availability системы.</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>2 способ так же лучше подходит в случае событийной модели общения сервисов</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>\"<span style=\"color: rgb(31, 31, 31);\">Long Polling\" хорошо подходят в случае долгих запросов со стороны UI сервисов</span></li></ol><p><br></p><p>Кандидат может назвать и другие плюсы/минусы, их необходимо отразить в ответе.</p>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>Кандидат имеет большой опыт в выборе/построении межсервисного взаимодействия. Приводит много не стандартных примеров реализации(нужно отразить в ответе). Назвал вышеуказанные и другие плюсы/минусы. </p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 641,
+                "title": "Service Communication"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:39:12Z",
+        "interviewCount": 1281,
+        "question": "<p>Межсервисное взаимодействие можно организовать несколькими способами:</p><p><br></p><ol><li data-list=\"ordered\"><span class=\"ql-ui\" contenteditable=\"false\"></span>http/grpc вызов метода с немедленным ожиданием результата</li><li data-list=\"ordered\"><span class=\"ql-ui\" contenteditable=\"false\"></span>общение через очередь kafka/RabbitMQ</li><li data-list=\"ordered\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Использование паттерна \"<span style=\"color: rgb(31, 31, 31);\">Long Polling\"</span></li><li data-list=\"ordered\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Возможно и иные форматы взаимодействия</li></ol><p><br></p><p>Какие есть плюсы/минусы первых трех форматов? </p><p>В каких случаях какой из форматов лучше применим? </p>",
+        "time": 5,
+        "title": "Выбор формата межсервисного взаимодействия"
+    },
+    {
+        "ID": 596,
+        "answers": [
+            {
+                "content": "<p>-</p>",
+                "difficulty": "GRADE_17"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:34:34Z",
+        "interviewCount": 1199,
+        "question": "<p>Рассказать про 1-2 простых паттерна(синглтон, стратегия, адаптер и т.д.) по выбору кандидата</p>",
+        "time": 3,
+        "title": "Рассказать про 1-2 простых паттерна(синглтон, стратегия, адаптер и т.д.) по выбору кандидата "
+    },
+    {
+        "ID": 1519,
+        "answers": [
+            {
+                "content": "<p>Архитектура спроектирована частично: на схеме есть БД и приложение, но возникают сложности при обсуждении балансировки, кешей, очередей.</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Спроектирована рабочая архитектура:</p><ul><li>полностью работает сценарий доставки сообщений</li><li>корректное проектирование БД</li><li>кандидат корректно использует инструменты: БД, очереди, кеши, балансировщики</li><li>решил вопрос с идемпотентностью операций</li></ul><p><br></p><p>Возникли сложности со следующими темами:</p><ul><li>горизонтальное масштабирование бекендов</li><li>шардирование базы / репликация данных / консистентность данных</li></ul>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>Основные ожидания от \"правильного\" решения:</p><ul><li>Общение по websocket (либо производным, типа SignalR). Опрашивать с клиента бекенд на предмет новых сообщений — no no.</li><li>Сообщения сохраняются в БД, реляционные вполне подходят для этой задачи, но могут быть и варианты например с cassandra.</li><li class=\"ql-indent-1\">В исходном задании есть только 1х1 чаты. Минимальный набор колонок для таблицы: msg_id, from_id, to_id, ts, text. Шардировать базу по паре sorted(from_id, to_id).</li><li>После сохранения сообщения в БД нужно доставить его до получателя</li><li>Инстансов бекенда может быть несколько (High Availability), поэтому нужно уметь находить инстанс, с которым установлено соединение у получателя.</li><li class=\"ql-indent-1\">Для этого нужно иметь маппинг – какой пользователь к какому серверу привязан (либо уметь это вычислять, например как в rendezvouz hashing).</li><li class=\"ql-indent-2\">Первый запрос к системе на старте приложения от устройства – получение инфы к какому бекенду подключаться. Затем установка websocket соединения с этим бекендом.</li><li class=\"ql-indent-2\">При отказе бекенда (и сопутствующим удалением узла из service discovery), клиенты повторяют стартовую процедуру – спрашивают новый сервер для установки соединения.</li><li class=\"ql-indent-1\">Когда определили инстанс бекенда получателя, нужно передать ему сообщение. Либо напрямую (rpc), либо использовать очереди.</li><li class=\"ql-indent-1\">Получатель может быть не онлайн, в этом случае стоит отправить ивент в notification service (apple, google)</li></ul>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 472,
+                "title": "System Design Tasks"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2022-07-13T19:50:01Z",
+        "interviewCount": 1197,
+        "question": "<p>Необходимо спроектировать архитектуру бекенда для мессенджера (Slack, Teams, Mattermost).</p><p><br></p><p><strong>Требования и ограничения:</strong></p><ul><li>до 10.000 пользователей в системе</li><li>сообщения должны доставляться быстро, в пределах нескольких секунд</li><li>только 1х1 чаты, без групповых чатов</li><li>сохраняется порядок сообщений, сообщения не дублируются</li><li>только текстовые сообщения, без вложений</li><li>должна быть возможность скроллить чат в прошлое, т.е. сообщения нужно хранить</li><li><span style=\"color: var(--ozMainBlack);\">сервис доступен через интернет</span></li><li>клиенты – мобильные устройства, их не нужно проектировать</li><li>авторизацию проектировать не нужно</li></ul><p><br></p><p><strong>Что требуется разобрать:</strong></p><ul><li>как будет выглядеть архитектура бекенда: приложение, базы данных, очереди, кеши</li><li>оценить нагрузку, размеры хранилищ</li><li>выбрать протокол взаимодействия между клиентом и сервером</li><li>пройти полный путь от отправки сообщения до доставки сообщения</li></ul><p><br></p><p>----------------------------------------</p><p><br></p><p><strong>Раздел для интервьюера:</strong></p><p><br></p><p>Темы для обсуждения, если у кандидата получилось собрать рабочую версию архитектуры:</p><ol><li>Точки отказа. Приложение, БД. Нужно делать High Availability.</li><li class=\"ql-indent-1\">После того как приложение стало HA, возникает вопрос как доставить сообщение, если получатель и отправитель попали на разные инстансы бекенда</li><li class=\"ql-indent-1\">Если бекендов стало несколько, и в системе есть брокер сообщений — сколько в нём очередей?</li><li>Если есть БД для сообщений и очередь для доставки — как атомарно сохранять сообщение в базу и отправлять событие в очередь?</li><li>Retry отправки на стороне клиента не должны приводить к дублям сообщений. Что делать?</li><li>У получателя приложение неактивно. Как уведомить?</li><li>Масштабируем нагрузку с 10к пользователей до 10м. Что меняется?</li><li class=\"ql-indent-1\">Тут при желании можно увести разговор в любую сторону и обсуждать любой интересующий аспект.</li></ol><p><br></p><p>Если осталось время, есть много вариантов расширений:</p><ul><li>групповые чаты</li><li>вложения</li><li>отображение статуса отправки / прочитанности</li><li>поиск по сообщениям</li></ul>",
+        "time": 90,
+        "title": "Design Messenger"
+    },
+    {
+        "ID": 1693,
+        "answers": [
+            {
+                "content": "<p>At Most Once — сообщение придёт получателю не более 1го раза (но может не придти). [p.s. есть нюансы, описаны в ответе на 20 грейд]</p><p>At Least Once — сообщение придёт получателю, возможно более 1го раза</p><p>Exactly Once — сообщение придёт / [будет обработано] получателем ровно 1 раз</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p><strong>Какие механики работы с сообщениями нужны на producer/consumer стороне, чтобы реализовать эти гарантии?</strong></p><p>Кандидат может объяснить в чём заключаются практические особенности разных гарантий доставки:</p><ul><li>необходимы ретраи отправки для \"at least once\" / \"exactly once\"</li><li>необходима дедупликация сообщений на стороне consumer для \"at least once\" / \"exactly once\"</li></ul><p><br></p><p>Кандидат понимает, что \"exactly once\" <strong>доставка</strong> невозможна из-за \"проблемы двух генералов\" (да и вообще слово доставка может очень по разному трактоваться), при этом \"exactly once\" <strong>обработку</strong> (выполнение определенного действия в бизнес логике) можно реализовать.</p><p><br></p><p><strong>Как выбирать гарантии доставки? Желательно на примере реальных систем</strong></p><ul><li>At most once подойдёт для систем, где допустимо потерять часть сообщений. Например, доставка логов или отсылка метрик.</li><li>At least once нужна в системах, где недопустимо терять сообщения. Например, нельзя терять данные, которые пересылаются в рамках бизнес логики — заявки на обработку, события о совершенных заказах и т.д.</li></ul>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p><strong>Как на практике реализовать цепочку producer -&gt; message broker -&gt; consumer для разных гарантий доставки?</strong></p><p><br></p><p><strong>At most once</strong></p><p>1) Producer отправляет сообщение в MessageBroker без ретраев.</p><p>2) Consumer читает сообщения из MessageBroker с автоматическим подтверждением доставки (например включен автокоммит)</p><p>p.s. Тут всё равно есть опция, что сообщение от брокера прилетит более одного раза, например если автокоммит не успеет случиться, брокер покрешится и после рестарта отправит сообщение снова. Не нужно думать что at most once гарантирует, что число доставок строго меньше одного. Просто название такое <span style=\"color: rgb(52, 73, 94);\">¯\\_(ツ)_/¯.</span></p><p><br></p><p><strong>At least once</strong></p><p>1) Сообщения содержат уникальный ID.</p><p>2) Producer отправляет сообщение в MessageBroker, помечает его у себя как отправленное. Если пометки для сообщения нет, делает retry.</p><p>Здесь возможны дубли, если в MessageBroker отправили, а пометить у себя не получилось.</p><p>3) Consumer читает сообщения из MessageBroker без автоматического подтверждения доставки</p><p>4) Consumer готов к дубликатам сообщений.</p><p>5) Consumer читает и обрабатывает сообщение.</p><p>6) Consumer подтверждает доставку брокеру.</p><p><br></p><p><strong>Exactly once</strong></p><p>1) Сообщения содержат уникальный ID.</p><p>2) Producer отправляет сообщение в MessageBroker, помечает его у себя как отправленное. Если пометки для сообщения нет, делает retry.</p><p>Здесь возможны дубли, если в MessageBroker отправили, а пометить у себя не получилось.</p><p>3) Consumer читает сообщения из MessageBroker без автоматического подтверждения доставки</p><p>4) Consumer имеет локальную БД, в которой по ID можно понять статус обработки.</p><p>5) Consumer проверяет статус обработки.</p><ul><li>Если в БД сказано, что сообщение обработано, consumer подтверждает доставку брокеру.</li><li>Если в БД ничего нет, consumer выполняет бизнес логику и добавляет запись в БД, затем подтверждает доставку брокеру.</li></ul>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 641,
+                "title": "Service Communication"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-01-17T23:37:30Z",
+        "interviewCount": 1178,
+        "question": "<p>Расскажите о разных гарантиях доставки/обработки сообщений при работе с брокерами сообщений</p><p>- at most once</p><p>- at least once</p><p>- exactly once</p><p><br></p><p>1) Что они из себя представляют, чем отличаются?</p><p>&nbsp;&nbsp;1.1) Какие механики работы с сообщениями нужны на producer/consumer стороне, чтобы реализовать эти гарантии?</p><p><br></p><p>2) В каких случаях какие гарантии доставки нужно выбирать? Желательно на примере реальных систем.</p><p><br></p><p>3) Как на практике выглядит цепочка producer -&gt; message broker -&gt; consumer для разных гарантий доставки?</p>",
+        "time": 20,
+        "title": "Гарантии доставки сообщений"
+    },
+    {
+        "ID": 595,
+        "answers": [
+            {
+                "content": "<p>https://ru.wikipedia.org/wiki/SOLID_(%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%D0%BD%D0%BE-%D0%BE%D1%80%D0%B8%D0%B5%D0%BD%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%D0%B5_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5)</p><p><br></p><p>Но лучше чтобы все было своими словами.</p><p><br></p>",
+                "difficulty": "GRADE_17"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:33:58Z",
+        "interviewCount": 1070,
+        "question": "<p>Дать определение(можно своими словами) 1-2 принципа SOLID (по выбору интервьюера)&nbsp;</p>",
+        "time": 1,
+        "title": "Дать определение(можно своими словами) 1-2 принципа SOLID (по выбору интервьюера) "
+    },
+    {
+        "ID": 598,
+        "answers": [
+            {
+                "content": "<p>-</p>",
+                "difficulty": "GRADE_18"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:35:35Z",
+        "interviewCount": 618,
+        "question": "<p>Рассказать про пример нарушения 1-2 принципов(по выбору интервьюера) SOLID</p>",
+        "time": 5,
+        "title": "Рассказать про пример нарушения 1-2 принципов(по выбору интервьюера) SOLID "
+    },
+    {
+        "ID": 606,
+        "answers": [
+            {
+                "content": "<p><span style=\"color: rgb(52, 73, 94);\">В случае хореографии, каждый элемент саги знает про следующий/предыдущий этап и оповещает его о успехе/ошибке. В случае оркестрации, есть отдельный оркестратор(чем-то напоминает реализацию распределенной транзакции), только он знает о последовательности вызовов элементов саги, каждый элемент саги знает только про оркестратор и не знает о других элементах.</span></p>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>Знает когда какой вариант лучше использовать. Как правило хореография выбирается в случае пайплайнов проходящих через несколько доменов/контекстов, так же она лучше подходит когда нет необходимости в логике откатов. Оркестрация же имеет больше контроля за сагой, проще получить ее текущее состояние, реализовать откаты, но при этом появляется центральная точка отказа в лице самого оркестратора. 20 грейд тут ставится если кандидат уверенно рассуждает на эту тему, имеет опыт использование как первого так и второго подхода</p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 641,
+                "title": "Service Communication"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:46:10Z",
+        "interviewCount": 600,
+        "question": "<p>Какие два подхода существует при реализации Саги?(про оркестровку и хореографию)&nbsp;</p>",
+        "time": 5,
+        "title": "Какие два подхода существует при реализации Саги?(про оркестровку и хореографию) "
+    },
+    {
+        "ID": 1690,
+        "answers": [
+            {
+                "content": "<p><strong>1) Round Robin</strong></p><p><br></p><p>Делаем запросы по очереди во все доступные бэкенды.</p><pre class=\"ql-syntax\" spellcheck=\"false\"><span class=\"hljs-keyword\">class</span> <span class=\"hljs-title class_\">RoundRobinBalancer</span> {\n\n&nbsp;&nbsp;  <span class=\"hljs-keyword\">private</span> List&lt;Backend&gt; backends = ...;\n\n&nbsp;&nbsp;  <span class=\"hljs-type\">int</span> <span class=\"hljs-variable\">current</span> <span class=\"hljs-operator\">=</span> <span class=\"hljs-number\">0</span>;\n\n&nbsp;&nbsp;  <span class=\"hljs-keyword\">public</span> <span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">route</span><span class=\"hljs-params\">(Request req)</span> {\n&nbsp;&nbsp;&nbsp;&nbsp;   <span class=\"hljs-type\">Backend</span> <span class=\"hljs-variable\">backend</span> <span class=\"hljs-operator\">=</span> backends.get(current);\n&nbsp;&nbsp;&nbsp;  &nbsp; backend.process(req);\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n&nbsp;&nbsp;&nbsp;  &nbsp; current = (current + <span class=\"hljs-number\">1</span>) % backends.size();\n&nbsp;&nbsp;}\n}\n</pre>",
+                "difficulty": "GRADE_17"
+            },
+            {
+                "content": "<p><strong>2) Random</strong></p><p><br></p><p>Делаем запросы в случайно выбранные бэкенды</p><pre class=\"ql-syntax\" spellcheck=\"false\"><span class=\"hljs-keyword\">class</span> <span class=\"hljs-title class_\">RandomBalancer</span> {\n\n&nbsp;&nbsp;  <span class=\"hljs-keyword\">private</span> List&lt;Backend&gt; backends = ...;\n\n&nbsp;&nbsp;  <span class=\"hljs-keyword\">private</span> <span class=\"hljs-type\">Random</span> <span class=\"hljs-variable\">rnd</span> <span class=\"hljs-operator\">=</span> <span class=\"hljs-keyword\">new</span> <span class=\"hljs-title class_\">Random</span>();\n\n&nbsp;&nbsp;  <span class=\"hljs-keyword\">public</span> <span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">route</span><span class=\"hljs-params\">(Request req)</span> {\n&nbsp;&nbsp;&nbsp;   &nbsp;<span class=\"hljs-type\">int</span> <span class=\"hljs-variable\">num</span> <span class=\"hljs-operator\">=</span> rnd.nextInt(<span class=\"hljs-number\">0</span>, backends.size());\n&nbsp;&nbsp;&nbsp;   &nbsp;<span class=\"hljs-type\">Backend</span> <span class=\"hljs-variable\">backend</span> <span class=\"hljs-operator\">=</span> backends.get(num);\n&nbsp;&nbsp;&nbsp;   &nbsp;backend.process(req);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n&nbsp;&nbsp;  }\n}\n</pre><p><br></p><p><strong>3) Weighted Round Robin</strong></p><p>Выставляем серверам веса, в зависимости от того какую долю нагрузки хотим на них направить.</p><p>К примеру, можно направлять больше нагрузки на более мощные сервера.</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p><strong>4) Least XXX (Connections, Response Time, Bandwidth, etc)</strong></p><p>Балансировщик выбирает сервер с наилучшим показателем целевой метрики.</p>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p><strong>5) Power of Two choices</strong></p><p>Случайным образом выбираем два бэкенда из списка. </p><p>Из этих двух выбираем лучший по целевой метрике (least connections, response time, etc).</p><p><br></p><p><strong>Алгоритмы, которые подходят для распределенных систем:</strong></p><p>Те, которые не требуют синхронизации:</p><ul><li>random</li><li>power of two choices</li></ul>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 640,
+                "title": "Load Balancing"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-01-15T20:33:46Z",
+        "interviewCount": 593,
+        "question": "<p>Какие алгоритмы балансировки вы знаете / можете придумать?</p><p><br></p><p>Какие из них можно использовать в распределенных системах?</p>",
+        "time": 5,
+        "title": "Алгоритмы балансировки"
+    },
+    {
+        "ID": 600,
+        "answers": [
+            {
+                "content": "<p><span style=\"color: rgb(52, 73, 94);\">Event sourcing (источники событий, регистрация событий, генерация событий) — архитектурный шаблон, при котором все изменения, вносимые в состояние приложения, сохраняются в той последовательности, в которой они происходили. На основе этого списка событий могут быть выстроены ReadModel для быстрого чтения данных.</span></p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:36:55Z",
+        "interviewCount": 480,
+        "question": "<p>Что такое Event sourcing?&nbsp;</p>",
+        "time": 5,
+        "title": "Что такое Event sourcing? "
+    },
+    {
+        "ID": 1831,
+        "answers": [
+            {
+                "content": "<p>18 грейд - принципиальное отличие от строковых.</p><p>19 грейд - когда что лучше? объяснит почему это хорошо с точки зрения чтения данных, но больно обновлять.</p>",
+                "difficulty": "GRADE_SCREENING"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-07-04T08:50:01Z",
+        "interviewCount": 333,
+        "question": "<p>Рассказать про устройство колоночных БД, зачем они используются и почему подходят под подобный тип задач.</p>",
+        "time": 5,
+        "title": "Колоночные БД"
+    },
+    {
+        "ID": 1692,
+        "answers": [
+            {
+                "content": "<p>Ожидаем увидеть REST API с тремя хендлерами вида POST/PATCH/DELETE <u>service.com/api/email,</u> либо аналог реализованный через URL (<u>api/email/create</u>, <u>api/email/patch</u>, <u>api/email/delete</u>). При дизайне API должна быть учтена идемпотентность, т.к. в условии есть пункт про списание денег.</p><p><br></p><p>Т.е. ключевая задача кандидата — заложить уникальный message_id в API и рассказать каким образом этот id будет обрабатываться на бэкенде (дефолтный вариант — хранится отдельной колонкой в таблице емейлов), чтобы избежать как дубли записей в БД, так и списаний денег с пользователя по несколько раз за одно действие.</p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 641,
+                "title": "Service Communication"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-01-16T16:22:02Z",
+        "interviewCount": 327,
+        "question": "<p>Вы строите систему, которая позволяет пользователям планировать (schedule) отправку емейлов на дату и время в будущем.</p><p><br></p><p>Система должна позволять пользователям перепланировать или отменить эти емейлы в любое время до их отправки.</p><p><br></p><p>Система также <strong>списывает деньги со счета пользователя</strong> за каждый запланированный емейл (сразу, а не в конце месяца; можно думать об этом, как о создании новой записи в таблице <strong>invoices</strong>), и <strong>возвращает деньги на счёт</strong> при отмене запланированного емейла (создании новой записи с типом <strong>rollback</strong> в таблице <strong>invoices</strong>).</p><p><br></p><p>Разработайте <strong>API</strong>, который позволит пользователям</p><ul><li>планировать (schedule),</li><li>переназначать, (reschedule)</li><li>отменять (cancel) емейлы.</li></ul>",
+        "time": 15,
+        "title": "Идемпотентность"
+    },
+    {
+        "ID": 1311,
+        "answers": [
+            {
+                "content": "<p>Кандидат спроектировал приложение и схему базы данных. Возникают сложности при обсуждении нагрузок, отказоустойчивости и других более сложных концепций.</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Кандидат оценил нагрузки и спроектировал все части системы:</p><ul><li>БД для хранения подписок, мета-информации по фотографиям</li><li class=\"ql-indent-1\">смог объяснить выбор СУБД</li><li>бекенды для сервисов</li><li>рассказал как обеспечить раздачу популярного контента</li></ul><p><br></p><p>Возникли сложности со следующими темами:</p><ul><li>Эффективное (быстрое) чтение ленты. Кандидат предложил sql select по followers и join фотографий</li><li>Шардирование данных</li><li>Репликация данных</li><li>Консистентность операций между S3 / БД / очередями</li><li>Хранение фото. Выбрана БД, а не object storage.</li></ul>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<h3><span style=\"color: rgb(52, 73, 94);\">Пример решения и встречных вопросов</span></h3><h4><br></h4><h4><span style=\"color: rgb(52, 73, 94);\">Нагрузки на систему</span></h4><p>В идеале кандидат сначала посчитает нагрузки на систему:</p><ul><li>Запись: в неделю публикуется 500м фото, ~800 rps</li><li>Чтение: в день лента листается 3 * 500млн раз, есть скроллинг, за 5 минутный сеанс минимум 10 скроллов, всего 3 * 10 * 500млн вызовов в день, ~170к rps</li><li>Объём хранилища фото при размере 100кб: 52 * 500м = 26 млрд фото в год * 100кб = 2.6 пб без учёта репликации</li><li>Объём БД зависит от выбранных полей, но в среднем будет в районе 1-20 тб</li></ul><p>Если этот шаг пропущен и кандидат уже начал рассказывать про микросервисы - к этому можно будет вернуться позже, когда дело дойдёт до нагрузок на БД.</p><p><br></p><p><br></p><p><br></p><h4><br></h4><h4><span style=\"color: rgb(52, 73, 94);\">Выбор хранилищ</span></h4><h6><br></h6><p><strong>Фото</strong></p><p>Фотографии нужно где-то хранить. Базовое решение здесь - использовать S3.</p><p>Кандидат может предлагать постройку велосипеда в виде собственного файлового хранилища или blob колонок в БД. Это может быть поводом проверить понимание архитектуры хранилищ данного типа, но обычно такой ответ уже кое о чём говорит. Типовые вопросы: как распределять данные по узлам, как их реплицировать, как организовать failover и как получить преимущества CDN.</p><p><br></p><p><br></p><p><br></p><h6><br></h6><p><strong>Данные</strong></p><p>Выбор БД чаще всего зависит от прошлого опыта кандидата, стандартные варианты такие:</p><ul><li>берём PostgreSQL / MySQL и шардируем</li><li>берём Cassandra / HBase / MongoDB и тд</li></ul><p>Независимо от выбора стоит обсудить как эксплуатировать БД с описанными выше объёмами и нагрузками. Здесь можно обсудить шардировании, либо отложить это на потом, когда речь зайдёт о самих запросах к БД.</p><p>В зависимости от выбора, можно уточнить почему кандидат выбрал SQL, а не NoSQL (или наоборот) и чем обусловлен выбор базы (лучше всего знаком с ХХХ - не самый лучший ответ).</p><p>Если речь зашла о шардировании - помимо выбора оптимального ключа шардирования, немаловажный вопрос - как генерировать id (см.&nbsp;<a href=\"https://instagram-engineering.com/sharding-ids-at-instagram-1cf5a71e5a5c\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: var(--theme-color,#42b983);\">https://instagram-engineering.com/sharding-ids-at-instagram-1cf5a71e5a5c</a>).</p><p>Здесь же будет логично обсудить репликацию.</p><p><br></p><p><br></p><p><br></p><h4><br></h4><h4><span style=\"color: rgb(52, 73, 94);\">Реализация AP</span><a href=\"http://platform.gp.o3.ru/committee/#/arch/tasks/instagram?id=%d0%a0%d0%b5%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d1%8f-api\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(52, 73, 94);\">I</a></h4><p>Есть два принципиальных подхода, от которых зависит успех/неуспех решения:</p><ol><li>Подготавливать ленту фото в бекграунде и при чтении запрашивать готовые данные</li><li>Строить ленту в моменте на каждый запрос</li></ol><p>Второй подход ломается на этапе построения SQL запроса (см. нагрузку в 170k rps и шардирование базы). Поход в эту сторону позволяет проверить знания sql и индексов, но лучше вырулить кандидата из этого болота, если хочется провести оставшееся время с пользой.</p><p>В этой секции затрагивается тема общения между сервисами, это повод обсудить service discovery и гарантии доставки.</p><h6><br></h6><h6><br></h6><pre class=\"ql-syntax\" spellcheck=\"false\"><span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">postPhoto</span>(<span class=\"hljs-params\">Photo p, UserID u</span>) {\n   s3_url = s3.<span class=\"hljs-title function_\">save</span>(p.<span class=\"hljs-property\">img</span>)\n   photo_id = photoService.<span class=\"hljs-title function_\">save</span>(u.<span class=\"hljs-property\">id</span>, s3_url)\n   mq.<span class=\"hljs-title function_\">push</span>(<span class=\"hljs-title class_\">UpdateFollowersFeedTask</span>(u.<span class=\"hljs-property\">id</span>, photo_id))\n}\n</pre><h6><br></h6><pre class=\"ql-syntax\" spellcheck=\"false\">void follow(UserID u1, UserID u2) {\n   followersService.follow(u1.<span class=\"hljs-built_in\">id</span>, u2.<span class=\"hljs-built_in\">id</span>)\n   mq.push(UpdateFeedOnNewFollowerTask(u1.<span class=\"hljs-built_in\">id</span>, u2.<span class=\"hljs-built_in\">id</span>))\n}\n</pre><p><br></p><p>В асинхронной модели действия по подготовке ленты уносятся в background. Актуальные вопросы:</p><ul><li>как не потерять событие отправки в mq (at-least-once)</li><li>как избежать race condition при обновлениях ленты пользователя</li><li>как хранится, обновляется и очищается лента</li></ul><h6><br></h6><h6><br></h6><pre class=\"ql-syntax\" spellcheck=\"false\"><span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">getFeed</span>(<span class=\"hljs-params\">UserID u, ...</span>) {\n</pre><p>Используя подход с предрассчитанной лентой, единственная задача&nbsp;<code style=\"background-color: rgb(248, 248, 248); color: rgb(233, 105, 0);\">getFeed</code>&nbsp;- проитерироваться по ней.</p><p>Один из подходов - использовать limit / offset. Проблема такого подхода - асинхронный процесс обновления ленты может вставить новые фото в начало списка и сломать нумерацию.</p><p>В этом же блоке можно обсудить кеши - как их наполнять и очищать.</p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 472,
+                "title": "System Design Tasks"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2022-03-31T17:30:12Z",
+        "interviewCount": 305,
+        "question": "<p>Ваша задача - спроектировать архитектуру для сервиса Instagram.</p><p><br></p><p>Нас интересует реализация 4х функций:</p><p><br></p><pre class=\"ql-syntax\" spellcheck=\"false\">    <span class=\"hljs-comment\">// публикует фото, отправленное с клиентского приложения</span>\n    ﻿<span class=\"hljs-comment\">// msg UploadedPhoto {</span>\n    ﻿<span class=\"hljs-comment\">//    byte[] img;</span>\n    ﻿<span class=\"hljs-comment\">//    string description;</span>\n    ﻿<span class=\"hljs-comment\">// }</span>\n    ﻿<span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">publishPhoto</span><span class=\"hljs-params\">(UploadedPhoto photo, UserID author)</span> \n    \n    <span class=\"hljs-comment\">// u1 подписывается на u2 и начинает видеть в своей ленте фотографии u2</span>\n    ﻿<span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">follow</span><span class=\"hljs-params\">(UserID u1, UserID u2)</span>\n    \n    <span class=\"hljs-comment\">// u1 отписывается от u2 и прекращает видеть в своей ленте фотографии u2</span>\n    ﻿<span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">unfollow</span><span class=\"hljs-params\">(UserID u1, UserID u2)</span>\n    \n    <span class=\"hljs-comment\">// пользователь получает ленту фотографий</span>\n    ﻿<span class=\"hljs-comment\">// в ней должны быть фото людей, на которых он подписан, в хронологическом порядке (новые сверху)</span>\n    ﻿<span class=\"hljs-comment\">// данное API используется клиентским приложением</span>\n    ﻿<span class=\"hljs-comment\">// должно поддерживать scrolling</span>\n    List&lt;Photo&gt; <span class=\"hljs-title function_\">getFeed</span><span class=\"hljs-params\">(UserID u, ...)</span>\n</pre><h4><br></h4><h4><span style=\"color: rgb(52, 73, 94);\">Ограничения (как в реальном Instagram):</span></h4><ul><li>DAU: 500 миллионов пользователей</li><li>MAU: 1.5 миллиарда пользователей</li><li>1 пользователь подписан на 50 других (0.9q)</li><li>1 пользователь раз в неделю публикует фото (0.9q)</li><li>1 пользователь 3 раза в день заходит смотреть ленту, сеанс длится 5 минут (0.9q)</li></ul><h4><br></h4><h4><span style=\"color: rgb(52, 73, 94);\">Допущения:</span></h4><ul><li>не требуется моментального попадания новой фотографии в ленты подписчиков, допустимы задержки в несколько минут</li><li>требуется целостность: если фотография опубликована, в какой-то момент она попадёт в ленты подписчиков</li></ul><h3><br></h3><p><strong style=\"color: rgb(52, 73, 94);\">Что ожидается от кандидата:</strong></p><p><br></p><ul><li>Осознать требования</li><li>Helicopter-view архитектуры</li><li>Выбрать хранилища данных</li><li class=\"ql-indent-1\">Описать схему данных, типы полей</li><li class=\"ql-indent-1\">Рассчитать объём хранилища на год (*)</li><li>Рассчитать нагрузку на систему (*)</li><li>Выбрать стек технологий</li><li>Максимально подробно описать происходящее внутри системы при API вызовах</li></ul><p><br></p><p><br></p><h2>Раздел для интервьюера</h2><p>Если основная часть завершена и осталось время - можно пройтись по стандартным вопросам эксплуатации крупных систем:</p><p><br></p><ul><li>какие части системы могут выйти из строя и как быть к этому готовым</li><li>как избежать каскадных отказов</li><li>как определять предельную нагрузку в сложных системах</li><li>как организовать балансировку трафика</li><li>как мониторить состояние сервисов и нагрузки</li></ul><p><br></p><p><strong style=\"color: rgb(52, 73, 94);\">Дополнительные релевантные темы по этой задаче:</strong></p><p><br></p><ul><li>realtime счётчики лайков и push-уведомления</li><li>умное ранжирование ленты</li><li>рекомендации</li><li>аналитика</li></ul><h6><br></h6><p><strong style=\"color: rgb(52, 73, 94);\">Проблемы масштабирования</strong></p><p><br></p><ul><li>worldwide scale: DNS, дата центры</li><li>репликация и бекапы</li><li>повышение эффективности работы CDN</li></ul>",
+        "time": 90,
+        "title": "Design Instagram"
+    },
+    {
+        "ID": 1830,
+        "answers": [
+            {
+                "content": "<p>Примеры и зачем нужны. </p><p><br></p><p>Почему в этих случая плохо/неудобно использовать реляционные базы.</p><p><br></p><p>На 19й грейд, рассказывает про ACID и BASE, какие гарантии дают NoSQL СУБД.</p>",
+                "difficulty": "GRADE_SCREENING"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-07-04T08:48:09Z",
+        "interviewCount": 285,
+        "question": "<p>Какие бывают и зачем нужны нереляционные базы данных</p>",
+        "time": 5,
+        "title": "Нереляционные БД"
+    },
+    {
+        "ID": 1805,
+        "answers": [
+            {
+                "content": "<p>В теории распределённых систем (множество узлов системы общаются через ненадежную среду - компьютерную сеть) CAP теорема утверждает, что невозможно обеспечить больше 2 из 3 свойств:</p><ul><li>Consistency (консистентность) - каждое чтение получает самую последнюю запись или ошибку</li><li>Availability (доступность) - каждый запрос получает ответ (без ошибок), без гарантии, что он содержит самую последнюю запись</li><li>Partition tolerance - система продолжает работать, несмотря на произвольное количество сообщений, отбрасываемых (или задерживаемых) сетью между узлами.</li></ul><p><br></p><p>Если происходит network partition, нужно выбрать одно из двух</p><ul><li>Отменить операцию - консистентность ОК, доступность не ОК</li><li>Выполнить операцию - консистентность не ОК, доступность ОК</li></ul><p><br></p><p>Теорема CAP подразумевает, что при наличии сетевого раздела нужно выбирать между консистентностью и доступностью.</p><p><br></p><p>Ни одна распределенная система не застрахована от сетевых сбоев, поэтому следует допускать возможность network partition. При наличии partition остается два варианта: согласованность или доступность. При выборе согласованности вместо доступности система вернет ошибку или тайм-аут, если конкретная информация не может быть гарантированно актуальной из-за разделения сети. При выборе доступности вместо согласованности система всегда будет обрабатывать запрос и пытаться вернуть самую последнюю доступную версию информации, даже если она не может гарантировать ее актуальность из-за разделения сети. В отсутствие сбоя сети, то есть когда распределенная система работает нормально, можно обеспечить как доступность, так и согласованность.</p><p><br></p><p>CAP часто понимают неправильно, как будто нужно навсегда отказаться от одной из трех гарантий. Фактически, выбор между согласованностью и доступностью стоит только тогда, когда происходит сетевой раздел или сбой; в остальное время не нужно идти на компромисс.</p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 710,
+                "title": "Distributed Systems"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-06-04T18:26:02Z",
+        "interviewCount": 276,
+        "question": "<p>Объясните в чём суть CAP теоремы</p>",
+        "time": 10,
+        "title": "CAP теорема"
+    },
+    {
+        "ID": 1688,
+        "answers": [
+            {
+                "content": "<p>Балансировка — это способ распределения нагрузки.</p><p>Балансировщик делает запросы по очереди (RoundRobin) во все доступные бекенды.</p><p>Тогда на каждый бэкенд придётся 1/N от общей нагрузки.</p>",
+                "difficulty": "GRADE_17"
+            },
+            {
+                "content": "<p><strong>Клиентская балансировка</strong></p><p>В этом подходе нет одного единственного сервиса, отвечающего за балансировку трафика. Задача распределения трафика решается на стороне клиента - для этого он должен знать список доступных бэкендов и иметь алгоритм выбора бэкенда для очередного запроса.</p><p><br></p><p>Для того, чтобы клиенты могли получать и обновлять списки доступных бэкендов нужен специальный сервис - ServiceRegistry. Его основная задачи - предоставлять API для регистрации бэкендов и управления маршрутами.</p><p><br></p><p>Задача контроля здоровья бэкендов может решаться на разных уровнях - и на уровне клиентов (в случае проблем срабатывает circuit breaker) и на уровне ServiceRegistry (для того, чтобы знания о проблемном бэкенде распространялись быстрее).</p><p><br></p><p><strong>Серверная балансировка</strong></p><p>В этом подходе функцию балансировки выполняет отдельно стоящий процесс - балансировщик.&nbsp;Он отвечает за маршрутизацию входящих клиентских запросов до бэкендов.&nbsp;Клиенты отправляют запросы прямо в балансировщик и не знают как устроена логика маршрутизации. Балансировщик предоставляет API для статического (конфигурационный файл) либо динамического обновления маршрутов.</p><p>В такой схеме балансировщик является единой точкой отказа, поэтому он должен работать в High Availability режиме.</p><p><br></p><p>Таким образом, балансировщик решает следующие задачи</p><p>1. Регистрация бэкендов</p><p>2. Распределение входящего трафика</p><p>3. Мониторинг здоровья бэкендов</p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 640,
+                "title": "Load Balancing"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-01-15T19:36:10Z",
+        "interviewCount": 217,
+        "question": "<p>Расскажите, чем отличается клиентская балансировка от серверной балансировки. </p><p>Как выбирать какую из них использовать для своей задачи?</p>",
+        "time": 5,
+        "title": "Клиентская vs Серверная балансировка"
+    },
+    {
+        "ID": 1803,
+        "answers": [
+            {
+                "content": "<p>Смотри полный ответ в разделе 20 грейд.</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Смотри полный ответ в разделе 20 грейд.</p>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>В качестве кеша можно использовать существующие KeyValue хранилища, например Redis или Memcached.</p><p><br></p><h2>Как, кем и когда наполнять кеш</h2><p>Есть две основные стратегии: наполнять кеш писателями при изменении данных в основной БД и наполнять кеш читателями когда происходит cache-miss.</p><p><br></p><p>Если наполнять кеш только при чтении, то мы можем читать неактуальные данные из кеша. Чтобы этого не происходило, нужно организовать инвалидацию кеша при изменении данных в основной БД. Либо подбирать более короткий TTL, чтобы уменьшить вероятность получения неактуальных данных - но это в свою очередь приведёт к увеличению нагрузки на БД.</p><p><br></p><p>Если наполнять кеш при записи, нужно определиться как именно будут происходить эти обновления. Можно сделать синхронный вызов [обновил БД -&gt; обновил кеш], но тогда образуется сильная связность между двумя системами. Нужно обрабатывать ситуацию, когда обновить кеш не удалось, при этом не блокировать основное изменение в БД. Можно сделать асинхронное обновление, например через очередь сообщений. В этом случае нужно гарантировать, что сообщения не потеряются (смотри вопрос о гарантиях доставки сообщений). Также нужно решить вопрос с версионированностью обновлений — два изменения одного ключа в БД могут поменять порядок в очереди, тогда в кеш попадут неверные данные.</p><p><br></p><h2>Как инвалидируются данные в кеше</h2><p>Если обновление кеша происходит при изменении данных в БД, то дополнительно инвалидировать ничего не нужно. Если за наполнение кеша отвечают читатели, нужно подбирать TTL в соответствии со спецификой работы с данными, при этом проблема неконсистентности остаётся.</p><p><br></p><h2>Гарантируется ли каким-то образом, что обновления в основной БД попадут в кеш</h2><p>Смотри ответ на первый вопрос.</p><p><br></p><h2>Кеш персистентный или нет? Что произойдет со всей системой, если откажет система кеширования?</h2><p>Проблема с неперсистентным кешом в том, что при отказе сервера кеш опустошается и вся нагрузка переключается на БД. При этом БД должна уметь эту нагрузку выдерживать, иначе рано или поздно отказ кеша приведет к полному отказу всего. </p><p>Если делать кеш персистентным, то нужно организовать работу с версиями. Вместе с данными на диске нужно хранить номер последнего обработанного обновления. В качестве WAL может выступать очередь сообщений, из которой можно вычитать новые данные с нужного места после рестарта.</p><p><br></p><h2>Какой уровень консистетности получился в описанной системе? Strict consistency или eventual consistency?</h2><p>Если сделать всё правильно, получится eventual consistency. При этом можно получить неконсистентные данные, если не решить проблему с обработкой обновлений в неверном порядке.</p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 643,
+                "title": "Caching"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-06-04T12:21:15Z",
+        "interviewCount": 194,
+        "question": "<h2>Основной вопрос</h2><p><br></p><p>Вы разрабатываете web-приложение, в котором есть сценарий частого обращения к объектам по ключу. Например, к профилям пользователей в социальных сетях, или к информации об акциях на бирже.</p><p><br></p><p>Для персистентного хранения объектов используется база данных — это может быть Cassandra, PostgreSQL, HBase, MySQL. Есть большой поток обновлений, который изменяет записи в БД.</p><p><br></p><p>Т.к. запросов на чтение очень много, вы решили сделать кеш над базой данных, чтобы уменьшить нагрузку на БД и улучшить время ответа.</p><p><br></p><p>Расскажите, как бы вы организовали работу с этим кешем.</p><p><br></p><p><strong>Нефункциональные требования:</strong></p><ul><li>в БД сотни миллионов записей</li><li>размер БД десятки террабайт</li><li>нагрузка на чтение 1 млн RPS</li><li>нагрузка на запись десятки тысяч RPS</li></ul><p><br></p><h2>Заметки для интервьюера</h2><p>Вопросы, которые стоит обсудить:</p><p>1) Как, кем и когда выполняется запись в кеш: читателем, если записи в кеше не нашлось или писателем на каждое обновление? Почему, какие trade offs?</p><p>2) Как инвалидируются данные в кеше?</p><p>3) Гарантируется ли каким-то образом, что обновления в основной БД попадут в кеш?</p><p>4) Кеш персистентный или нет? Что произойдет со всей системой, если откажет система кеширования?</p><p>5) Какой уровень консистетности получился в описанной системе? Strict consistency или eventual consistency?</p>",
+        "time": 30,
+        "title": "Стратегии кеширования"
+    },
+    {
+        "ID": 1698,
+        "answers": [
+            {
+                "content": "<p>Кандидат понимает, что инстансы сервисов привязаны к IP адресам, а для организации сетевого взаимодействия на стороне клиента нужно знать IP адреса бекендов, либо обращаться через reverse proxy.</p><p><br></p><p>Понимает, что bg/canary предполагают постепенное переключение трафика, но не может по шагам описать процесс.</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Кандидат может рассказать как решать задачу Service Discovery.</p><p>Кандидат может в деталях рассказать в чём принцип bg/canary deploy.</p>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>Кандидат может в деталях рассказать в чём проблематика роутинга межсервисного трафика в сетапе нескольких датацентров; как организовать работу с базами данных и другими персистентными хранилищами, как утилизировать кросс-дц каналы связи.</p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 641,
+                "title": "Service Communication"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-01-18T21:46:03Z",
+        "interviewCount": 179,
+        "question": "<p>Вы разрабатываете архитектуру ecommerce маркетплейса. Планируется, что в системе будет большое число независимо развертываемых микросервисов, отвечающих за разные функции бизнеса: логистику, складские системы, API для витрин клиентского приложения и т.д.</p><p><br></p><p>В такой системе необходима надежная коммуникация между микросервисами. Также, хотелось бы иметь автоматизированные деплои сервисов с поддержкой современных механизмов развертывания новых версий (blue-green deploy / canary deploy), без downtime для клиентов.</p><p><br></p><p>Расскажите как бы вы организовали взаимодействие между сервисами:</p><ul><li>как сервису А узнать, по какому адресу обращаться к сервису В</li><li>как деплоить новую версию сервиса В</li><li class=\"ql-indent-1\">объясните в чём принцип blue-green deploy / canary deploy</li><li>как предложенная схема будет функционировать, если мы хотим размещать сервисы в нескольких датацентрах</li></ul><p><br></p><p>p.s. Если предлагается готовое решение, типа Eureka/Zookeeper — объясните как они устроены.</p>",
+        "time": 20,
+        "title": "Service Discovery"
+    },
+    {
+        "ID": 597,
+        "answers": [
+            {
+                "content": "<p>Трехслойная архитектура системы состоит из уровня презентаций, уровня приложений и уровня баз данных. Первый слой отвечает за формат возвращаемых данных, второй за логику и третий за хранение данных.</p><p>Гексагональная архитектура - это слоеная архитектура, также иногда называемая архитектурой портов и адаптеров. Называют ее так потому, что в рамках этой архитектуры имеется концепция различных портов, которые могут быть использованы (адаптированы) для использования с другими слоями. То есть, по сути, в центре этой архитектуры есть бизнес логика, которая использует интерфейсы различных портов для доступа к данным и взаимодействия с другими системами. То есть, например, адаптер доступа к базе данных - это отдельная бибилиотека, так же, как и адаптер для отправки писем.</p><p>Луковая - есть слои, причем зависимости всегда направлены внутрь, то есть слой может использовать любой из слоев внутри него. Внутренний слой - это модель предметной области, а внешний - инфраструктура, но количество слоев между ними может варьироваться(слой приложения, доменные сервисы и т.д.).</p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:35:11Z",
+        "interviewCount": 170,
+        "question": "<p>Рассказать про отличия трехслойная, гексагональной и луковой архитектуры?</p>",
+        "time": 5,
+        "title": "Рассказать про отличия трехслойная, гексагональной и луковой архитектуры? "
+    },
+    {
+        "ID": 604,
+        "answers": [
+            {
+                "content": "<p>Двухфазная фиксация является алгоритмом для атомарной фиксации транзакций в случае нескольких узлов. Другими словами, она гарантирует, что все узлы либо зафиксировали транзакцию, либо прервали ее.</p><p>В 2PC используется компонент, который обычно не появляется в транзакциях в одном узле: координатор (также известный как диспетчер транзакций).</p><p>Транзакция 2PC начинается с того, что приложение, как обычно, выполняет чтение и запись данных в нескольких узлах БД. Эти узлы называют участниками транзакции. Когда приложение готово к фиксации, координатор начинает этап 1: он отправляет запрос на подготовку каждому из узлов, спрашивая их, могут ли они выполнить фиксацию. Затем координатор отслеживает ответы участников. </p><ul><li>Если все участники ответили «да», показав, что они готовы к фиксации, то на этапе 2 координатор отправляет запрос фиксации и выполняется фиксация. </li><li>Если один из участников ответил «нет», то на этапе 2 координатор отправляет всем узлам запрос прерывания.</li></ul><p><br></p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 710,
+                "title": "Distributed Systems"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:43:27Z",
+        "interviewCount": 163,
+        "question": "<ol><li>Как может быть реализована распределенная транзакция методом 2PC(двухфазная фиксация)?</li><li>Гарантирует ли протокол консистентность?&nbsp;</li><li>Как протокол двухфазной фиксации обрабатывает сбои? Перечислите виды и механизмы восстановления.</li><li>Что произойдет при одновременном отказе узла и координатора?</li><li>Какие альтернативы 2PC вам известны? (3PC, Sagas и тд) </li></ol>",
+        "time": 5,
+        "title": "Как может быть реализована распределенная транзакция методом 2PC(двухфазная фиксация)? "
+    },
+    {
+        "ID": 1689,
+        "answers": [
+            {
+                "content": "<p>Сохраняем соответствие между User IP address и BackendID.</p><p>Если соответствия нет, выбираем рандомный бекенд и запоминаем это с подходящим TTL.</p><p>При последующих запросах направляем на тот же бэкенд.</p><pre class=\"ql-syntax\" spellcheck=\"false\"><span class=\"hljs-keyword\">class</span> <span class=\"hljs-title class_\">LoadBalancer</span> {\n\n     <span class=\"hljs-keyword\">private</span> BackendProvider backends;\n\n     <span class=\"hljs-keyword\">private</span> Map&lt;IpAddress, BackendID&gt; user2backend = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-title class_\">HashMap</span>&lt;&gt;();\n\n     <span class=\"hljs-keyword\">public</span> <span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">route</span><span class=\"hljs-params\">(Request request)</span> {\n           <span class=\"hljs-type\">IpAddress</span> <span class=\"hljs-variable\">ip</span> <span class=\"hljs-operator\">=</span> request.getRequestIP();\n\n           <span class=\"hljs-keyword\">if</span> (user2backend.containsKey(ip)) {\n                <span class=\"hljs-type\">BackendID</span> <span class=\"hljs-variable\">bid</span> <span class=\"hljs-operator\">=</span> user2backend.get(ip);\n                backends.get(bid).process(request);\n           } <span class=\"hljs-keyword\">else</span> {\n                <span class=\"hljs-type\">BackendID</span> <span class=\"hljs-variable\">bid</span> <span class=\"hljs-operator\">=</span> backends.getRandomBackendID();\n                user2backend.put(ip, bid);\n                backends.get(bid).process(request);\n           }\n     }\n}\n</pre>",
+                "difficulty": "GRADE_17"
+            },
+            {
+                "content": "<p><br></p><p><br></p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Способы реализовать sticky sessions:</p><p><br></p><p>1): Запоминать соответствие ip &lt;-&gt; backend. Смотри ответ на 17 грейд. Не делай так в production.</p><p><br></p><p>2) IP address affinity: выполняем роутинг на основе IP адреса пользователя. На примере с фиксированным числом бекендов равным N — можно определять id бэкенда по формуле  ip_address % N</p><p><br></p><p>3) Cookies: при первом обращении сервер добавляет в ответ cookie вида \"BackendID: XXX\". Клиент, получив этот куки, начинает добавлять во все последующие запросы в хедер этот BackendID. Балансировщик на основе хедера будет отправлять запрос в соответствующий бекенд.</p><p><br></p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 640,
+                "title": "Load Balancing"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-01-15T20:09:11Z",
+        "interviewCount": 152,
+        "question": "<p>Бекенд нашего сервиса запущен на 10 серверах, перед которыми стоит балансировщик нагрузки.</p><p><br></p><p>По ходу работы пользователя с нашим сервисом, мы сохраняем информацию в пользовательскую сессию. Например, товары которые он просмотрел или добавил в корзину. Сессия живёт в памяти сервиса, поэтому нам необходимо, чтобы запросы от одного пользователя всегда приходили на один и тот же бэкенд. Мы не можем использовать стандартный Round Robin.</p><p><br></p><p>1) Как добиться такого поведения?</p><p><br></p><p>2) Какие реализации механизма sticky session вы знаете / можете предложить?</p>",
+        "time": 5,
+        "title": "Sticky Sessions"
+    },
+    {
+        "ID": 605,
+        "answers": [
+            {
+                "content": "<p>Вид хеширования, отличающийся тем, что когда хеш-таблица перестраивается, только K/n ключей в среднем должны быть переназначены, где K — число ключей и n число слотов (slots, buckets). В противоположность этому, в большинстве традиционных хеш-таблиц, изменение количества слотов вызывает переназначение почти всех ключей.</p><p>Одно из применений - это решардирование баз данных.</p><p><br></p><p><br></p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 710,
+                "title": "Distributed Systems"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2021-10-24T21:45:33Z",
+        "interviewCount": 145,
+        "question": "<p>Что такое консистентное хэширование и для чего оно применимо?&nbsp;</p>",
+        "time": 5,
+        "title": "Что такое консистентное хэширование и для чего оно применимо? "
+    },
+    {
+        "ID": 2329,
+        "answers": [
+            {
+                "content": "<p>На 19-й грейд требуется: дать определение, объяснить мотивацию использования и перечислить хотя бы три основных понятия.  </p><p><br></p><p><span style=\"color: var(--text-500);\">Domain-Driven Design - подход разработки программного обеспечения, который акцентирует внимание на моделировании предметной области для создания понятных и поддерживаемых программных систем.</span></p><p><br></p><p><span style=\"color: var(--text-500);\">Основные понятия и паттерны:</span></p><p><br></p><ol><li><span style=\"color: var(--tw-prose-bold);\">Ограниченный контекст (Bounded Context): Четко обособленная граница в рамках предметной области, в рамках которой модели и отношения между ними имеют устойчивый смысл. Пример: контекст продаж, контекст поддержки.</span></li><li><span style=\"color: var(--tw-prose-bold);\">Единый язык(Ubiquitous Language):</span> Общий язык, который используется в пределах ограниченного контекста и является единым для всех участников команды. Это облегчает понимание и общение между разработчиками, бизнес-аналитиками и заказчиками.</li><li><span style=\"color: var(--tw-prose-bold);\">Сущность (Entity):</span> Объект с определенной идентичностью, который продолжает существовать и изменяться со временем. Например, это может быть клиент, заказ или другой объект в предметной области.</li><li><span style=\"color: var(--tw-prose-bold);\">Значение (Value Object):</span> Объект, который не имеет собственной идентичности и оценивается только по своим атрибутам. Например, координаты, дата или денежная сумма.</li><li><span style=\"color: var(--tw-prose-bold);\">Агрегат (Aggregate):</span> Группа связанных между собой сущностей и значений, рассматриваемых как единое целое. Один из объектов в агрегате является корневым и ответственным за согласование изменений внутри агрегата.</li><li><span style=\"color: var(--tw-prose-bold);\">Репозиторий (Repository):</span> Обеспечивает доступ к объектам предметной области, абстрагируясь от способа их хранения. Репозитории используются для получения, сохранения и удаления сущностей.</li><li><span style=\"color: var(--tw-prose-bold);\">Фабрика (Factory):</span> Отвечает за создание сложных объектов, освобождая клиентский код от деталей их конструирования.</li><li><span style=\"color: var(--tw-prose-bold);\">Сервис (Service):</span> Выполняет операции, которые не принадлежат непосредственно к какой-либо сущности или значению. Сервисы используются для реализации бизнес-логики, которая не подходит под ответственность отдельной сущности.</li><li><span style=\"color: var(--tw-prose-bold);\">Событие (Event):</span> Запись о факте, произошедшем в системе. События могут использоваться для обмена информацией между компонентами системы.</li></ol>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>Если кандидат обладает экспертными знаниями и имеет практический опыт проектирования крупных архитектурных решений.</p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 912,
+                "title": "Code Patterns"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2024-03-06T06:56:48Z",
+        "interviewCount": 116,
+        "question": "<p>Расскажите про DDD и основные понятия.</p><p><br></p><p>Каким способом можно разбить предметную область на ограниченные контексты?</p><p><br></p><p>Приведите пример возможных ограниченных контекстов в Озоне.</p><p><br></p><p>Почему важен единый язык?</p><p><br></p><p>Для каких типов проектов лучше всего подходит данный подход?</p><p><br></p><p>Какие антипаттерны в реализации DDD вам известны?</p>",
+        "time": 10,
+        "title": "Domain-Driven Design "
+    },
+    {
+        "ID": 1804,
+        "answers": [
+            {
+                "content": "<p>Проблема вызвана тем, что действия происходят параллельно и от порядка их выполнения зависит финальный результат. Для решения проблемы нужно гарантировать порядок исполнения.</p><p><br></p><p>Можно добавить версионность в работу с данными — оперировать таймстампами операций на сервере или версиями.</p><p><br></p><p><strong>Например:</strong></p><p>Добавляем версию. Изначально в БД есть запись { Х=\"a\", v=1 }, в кеше нет записей для ключа Х.</p><p><br></p><p><strong>Reader</strong></p><p>При чтении из кеша происходит cache miss, далее из БД подгружается запись { X=\"a\", v=1 }.</p><p><br></p><p><strong>Writer</strong></p><p>Обновляет запись на X=\"b\" и её версия повышается до 2. После этого инвалидируется кеш. Это можно сделать несколькими способами: </p><p>1) Сделать синхронный вызов. После этого в кеше будет запись { X=\"b\", v=2}, либо {X=null, v=2} в зависимости от принципа инвалидации.</p><p>2) Положить сообщение в очередь</p><p>Для определенности будем считать, что работаем через очередь.</p><p><br></p><p><strong>Reader</strong></p><p>Кладёт сообщение {X=\"a\", v=1} в очередь</p><p><br></p><p><strong>Обработчик очереди (singleton)</strong></p><p>При обработке сообщений для Х в порядке v=1, затем v=2</p><p>1) помещает в кеш X=\"a\", v=1</p><p>2) помещает в кеш Х=\"b\", v=2</p><p>Eventual Consistency выполнено.</p><p><br></p><p>При обработке сообщений для Х в порядке v=2, v=1</p><p>1) помещает в кеш X=\"b\", v=2</p><p>2) игнорирует сообщение с v=1</p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 643,
+                "title": "Caching"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-06-04T13:09:31Z",
+        "interviewCount": 106,
+        "question": "<p>В системе есть основная БД и кеш для быстрого чтения.</p><p><br></p><p>Работа с кешем организована следующим образом:</p><p>1) когда происходит обновление в БД, запись из кеша удаляется по ключу</p><p>2) когда при чтении из кеша случается cache-miss, происходит чтение из БД и полученные данные сохраняются в кеш</p><p><br></p><p>Во время эксплуатации обнаружили следующую проблему:</p><pre class=\"ql-syntax\" spellcheck=\"false\">&lt;reader&gt;                                    &lt;writer&gt;\n\nlookup X in <span class=\"hljs-title function_\">cache</span> <span class=\"hljs-params\">(miss)</span>\nread X from <span class=\"hljs-title function_\">storage</span> <span class=\"hljs-params\">(X=<span class=\"hljs-string\">\"a\"</span>)</span>\n﻿\n                                write to <span class=\"hljs-title function_\">storage</span> <span class=\"hljs-params\">(X=<span class=\"hljs-string\">\"b\"</span>)</span>\n                                   invalidate cache\n\npopulate cache X=<span class=\"hljs-string\">\"a\"</span>\n<span class=\"hljs-keyword\">return</span> X=<span class=\"hljs-string\">\"a\"</span> to client\n</pre><p><br></p><p>Читатель может записать в кеш неактуальные данные. При этом нарушается eventual consistency, т.к. теперь уже некому записать в кеш правильные данные. Как решить эту проблему?</p>",
+        "time": 15,
+        "title": "Инвалидация кеша"
+    },
+    {
+        "ID": 1312,
+        "answers": [
+            {
+                "content": "<h1><span style=\"color: rgb(52, 73, 94);\">Темы для обсуждения</span></h1><h4><br></h4><h2><span style=\"color: rgb(52, 73, 94);\">Оффлайн обработка</span></h2><p>Хранилище данных должно обладать следующими свойствами:</p><p><br></p><ul><li>горизонтальное масштабирование</li><li>поддержка blob storage</li><li>поддержка пакетной обработки данных</li><li>отказойстойчивость</li></ul><p>Возможные вопросы по теме:</p><p><br></p><ul><li>что выбрать ключом хранилища для сохранения скачанной веб страницы</li><li>как реализовать шардинг</li><li>как физически хранить версии веб страницы и какое кол-во целесообразно хранить</li><li>как реализовать процесс индексации (требует обработки всех записей)</li><li>какие существующие системы можно использовать для этой задачи</li></ul><h4><br></h4><h2><span style=\"color: rgb(52, 73, 94);\">Схема индекса</span></h2><p>Эталонное решение - обратный индекс.</p><p>Если кандидат разбирается в прмедметной области, можно обсудить:</p><p><br></p><ul><li>формат постинг листов</li><li>компрессию ключей</li><li>компрессию постинг листов</li><li>оптимизации обработки постинг листов</li></ul><p>Если кандидат не знает об обратном индексе и предлагает sql-подобные решения (например many-to-many таблицу document-term), можно задавать следующие вопросы:</p><p><br></p><ul><li>асимптотика операции поиска? как физически данные в такой таблице будут лежать на диске?</li><li>как бороться с дубликатами термов?</li><li>как выполнять реиндексацию (добавлять/удалять строки)?</li></ul><p>Независимо от выбранного решения, следует разобрать вопрос шардирования:</p><p><br></p><ul><li>оценить размер индекса, полученного на предыдущем шаге</li><li>похоже, что он не поместится в память одного сервера, что делать?</li><li>как выбрать способ шардирования?</li></ul><h4><br></h4><h2><span style=\"color: rgb(52, 73, 94);\">Бекенд поиска</span></h2><p>К этому моменту мы получили схему с обратным индексом (файлики), шардированному по множеству серверов.</p><p><br></p><ul><li>Каждый сервер, работая со своим шардом индекса предоставляет API поиска по одному терму, при этом по условию мы должны предоставлять поиск по фразе, состоящей из нескольких слов. Как реализовать такой поиск?</li><li>Нагрузка на чтение &lt;необходимо её рассчитать&gt; превышает физические возможности одного сервера. Как с этим быть?</li><li class=\"ql-indent-1\">Если рассматриваем вариант с репликами шарда, как происходит балансировка нагрузки между репликами? Как реализован service discovery: по какому адресу обращается клиент? как добавлять новые реплики?</li><li>Как обеспечить отказойстойчивость (могут отказывать отдельные шарды и реплики индекса)?</li><li>Как реализовать кеширование результатов поиска?</li><li class=\"ql-indent-1\">На каком уровне системы ставить кеши?</li><li class=\"ql-indent-1\">Как обезопаситься от перегрузки бекендов при падении кешей?</li><li class=\"ql-indent-1\">Как инвалидировать кеши?</li><li class=\"ql-indent-1\">И другие вопросы из раздела&nbsp;<code style=\"background-color: rgb(248, 248, 248); color: rgb(233, 105, 0);\">/arch/theory/caching</code></li></ul><p>В данном разделе мы обсуждаем архитектуру production, поэтому можно затронуть вопросы DNS и L3/L7 балансировки.</p><p><br></p><h4><br></h4><h2><span style=\"color: rgb(52, 73, 94);\">RealTime обновлени</span><a href=\"http://platform.gp.o3.ru/committee/#/arch/tasks/search_engine?id=realtime-%d0%be%d0%b1%d0%bd%d0%be%d0%b2%d0%bb%d0%b5%d0%bd%d0%b8%d1%8f\" rel=\"noopener noreferrer\" target=\"_blank\" style=\"color: rgb(52, 73, 94);\">я</a></h2><p>Как реализовать realtime обновления индекса на production? Считаем, что Web Crawler постоянно занимается скачиванием web-страниц и сохранением результатов в хранилище.</p><p>Можно обсудить как helicopter-view архитектуры (где происходит индексация, как данные попадают на нужные сервера), так и более продвинутые темы, например особенности физического обновления индекса (immutable сегменты, смена версий индекса, концепт live-documents)</p>",
+                "difficulty": "GRADE_20"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 472,
+                "title": "System Design Tasks"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2022-03-31T17:38:34Z",
+        "interviewCount": 80,
+        "question": "<p>Ваша задача - спроектировать архитектуру сервиса поиска (Google, Yandex, Bing):</p><p><br></p><ul><li>хранилище информации найденной на веб страницах</li><li>индексатор</li><li>бекенд поиска</li></ul><p><br></p><p>Клиентское API поиска должно выглядеть следующим образом:</p><p><br></p><pre class=\"ql-syntax\" spellcheck=\"false\">def <span class=\"hljs-title function_\">search</span>(<span class=\"hljs-attr\">searchQuery</span>: <span class=\"hljs-built_in\">string</span>, ...) -&gt; <span class=\"hljs-title class_\">List</span>[<span class=\"hljs-title class_\">SearchResult</span>]\n</pre><p><br></p><p>Если поисковый запрос состоит из нескольких слов, нужно найти документы, в которых встречаются все слова из запроса.</p><p><br></p><h4><br></h4><h2><strong style=\"color: rgb(52, 73, 94);\">Ограничения:</strong></h2><ul><li>DAU: 1 миллиард пользователей</li><li>1 пользователь в среднем делает 5 поисковых запросов в день</li><li>Response time limit: 200мс</li><li>Поисковому роботу доступен 1 трлн веб страниц</li></ul><p><br></p><h2><span style=\"color: rgb(52, 73, 94);\">Что ожидается от кандидата:</span></h2><ul><li>Осознать требования</li><li>Helicopter-view архитектуры</li><li>Оффлайн обработка</li><li class=\"ql-indent-1\">выбрать хранилище для сырых данных</li><li class=\"ql-indent-1\">описать процесс индексации (map reduce)</li><li>Схема индекса</li><li class=\"ql-indent-1\">как устроен индекс</li><li class=\"ql-indent-1\">как выполняется поиск по индексу</li><li>Бекенд поиска</li><li class=\"ql-indent-1\">рассчитать нагрузку на поисковое API</li><li class=\"ql-indent-1\">описать архитектуру</li><li>Выбрать стек технологий</li></ul><p><br></p>",
+        "time": 90,
+        "title": "Design Web Search"
+    },
+    {
+        "ID": 1806,
+        "answers": [
+            {
+                "content": "<p><strong>Один из вариантов решения</strong></p><p><br></p><p>Используем Zookeeper или Etcd как сервис для организации распределенных блокировок. Нам потребуется от него API вида \"получить lease для ключа с заданным таймаутом\", \"проверить валидность lock\".</p><p><br></p><p>Перед началом редактирования документа, пытаемся получить lock. В случае успеха будем использовать его для коммита изменений, в случае неудачи (lock уже кем-то захвачен) можем открыть документ только в readonly режиме.</p><p><br></p><p>При сохранении документа проверяем, является ли lock актуальным. Данную операцию нужно выполнять атомарно с сохранением документа в БД. В примере кода ниже это не так. Если операция выполняется неатомарно, то lease может истечь между проверкой и сохранением данных в БД.</p><p><br></p><p>Для защиты от этой проблемы используется подход \"fencing token\" — при получении lock для редактирования, к записи в БД добавляется уникальный lock ID. Редактирование записи в БД допускается только если lock ID в запросе (fencing token) совпадает с сохраненным в БД. Таким образом, даже если клиентское приложение не поймёт что lock/lease устарел, система будет защищена от некорректного обновления данных.</p><p><br></p><pre class=\"ql-syntax\" spellcheck=\"false\">DistributedLockService locks = ...;\n\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">public</span> WebDoc <span class=\"hljs-title\">read</span>(<span class=\"hljs-params\"><span class=\"hljs-built_in\">int</span> docID</span>)</span> {\n    Lock <span class=\"hljs-keyword\">lock</span> = locks.tryLock(docID, minutes(<span class=\"hljs-number\">10</span>));    \n    Doc doc = db.loadDoc(docID);\n    \n    <span class=\"hljs-comment\">// if lock failed, doc is read only</span>\n\n    <span class=\"hljs-keyword\">return</span> <span class=\"hljs-keyword\">new</span> WebDoc(doc, <span class=\"hljs-keyword\">lock</span>, <span class=\"hljs-keyword\">readonly</span>=<span class=\"hljs-keyword\">lock</span>.isFailed);﻿\n}\n\n<span class=\"hljs-comment\">// periodically call from client, if user still works with doc</span>\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">public</span> <span class=\"hljs-keyword\">void</span> <span class=\"hljs-title\">ping</span>(<span class=\"hljs-params\">WebDoc doc</span>)</span> {\n     locks.tryRenew(doc.id, doc.<span class=\"hljs-keyword\">lock</span>);\n}\n\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">public</span> <span class=\"hljs-keyword\">void</span> <span class=\"hljs-title\">update</span>(<span class=\"hljs-params\">WebDoc doc</span>)</span> {\n     boolean ok = locks.checkLock(doc.id, doc.<span class=\"hljs-keyword\">lock</span>, minutes(<span class=\"hljs-number\">10</span>));\n     \n     <span class=\"hljs-keyword\">if</span> (!ok) {\n        <span class=\"hljs-keyword\">throw</span> <span class=\"hljs-keyword\">new</span> LockExpiredException(doc); \n     }\n     \n     db.updateDoc(doc.id, doc.content);\n     \n     locks.release(doc.<span class=\"hljs-keyword\">lock</span>)\n}\n</pre>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 710,
+                "title": "Distributed Systems"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2023-06-04T23:40:35Z",
+        "interviewCount": 79,
+        "question": "<p>Вы разрабатываете сервис, в котором юристы работают с документами. Есть база данных с большим количеством документов и web-интерфейс, с помощью которого юристы вносят правки в документы.</p><p><br></p><p>Метод для подгрузки документа в web-интерфейс:</p><pre class=\"ql-syntax\" spellcheck=\"false\"><span class=\"hljs-function\"><span class=\"hljs-keyword\">public</span> <span class=\"hljs-built_in\">byte</span>[] <span class=\"hljs-title\">read</span>(<span class=\"hljs-params\"><span class=\"hljs-built_in\">int</span> docID</span>)</span> {\n    <span class=\"hljs-keyword\">return</span> db.loadDoc(docID).getContent();\n}\n</pre><p><br></p><p>Метод для сохранения документа:</p><pre class=\"ql-syntax\" spellcheck=\"false\"><span class=\"hljs-keyword\">public</span> <span class=\"hljs-keyword\">void</span> <span class=\"hljs-title function_\">update</span><span class=\"hljs-params\">(<span class=\"hljs-type\">int</span> docID, <span class=\"hljs-type\">byte</span>[] content)</span> {\n     <span class=\"hljs-type\">Doc</span> <span class=\"hljs-variable\">doc</span> <span class=\"hljs-operator\">=</span> db.loadDoc(docID);\n     doc.setContent(content);\n     db.updateDoc(docID, content);\n}\n</pre><p><br></p><p>Т.к. несколько юристов могут одновременно начать работать над одним документом, то результаты редактирования могут быть сохранены неправильно (в БД окажется версия, сохраненная последней). Для защиты от такой ситуации необходимо организовать блокировку документа на время редактирования, чтобы только один юрист мог вносить правки в один момент времени.</p><p><br></p><p>Опишите, как бы вы реализовали работу с блокировками?</p>",
+        "time": 20,
+        "title": "Distributed Locking"
+    },
+    {
+        "ID": 2525,
+        "answers": [
+            {
+                "content": "<p>Кандидат знает про master-slave репликацию в базах данных. Знает о том, что благодаря репликации создается копия хранилища данных, которое можно использовать, если мастер-хранилище выйдет из строя. Затрудняется рассказать что-то более глубоко.</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Кандидат знает про синхронную и асинхронную репликацию, может объяснить в чём их отличия и как выглядит типичная конфигурация хранилища с несколькими репликами.</p><p><br></p><p>Кандидат понимает, что реплики могут быть использованы для балансировки нагрузки, а не только как горячий бекап.</p><p><br></p><p>Кандидат понимает проблему отставания данных на асинхронной реплике и последствия, к которым она может приводить.</p><p><br></p><p>Кандидат может объяснить, что будет происходить при отказах узлов.</p>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>Кандидат знает про разные стратегии acknowledgement на репликах при синхронизации данных. Понимает проблему чтения несвежих данных клиентом с синхронной реплики, если она работает в режиме сохранения WAL лога, но без его применения.</p><p><br></p><p>Кандидат знает про отличия логического и бинарного типа репликации. Может рассказать на примерах как работают оба вида, к каким последствиям приводит каждый из них.</p><p><br></p><p>Кандидат знает про разные типы связей между узлами: master-slave, master-master, peer-2-peer. Кандидат знает или может порассуждать о snapshot репликации, методах доставки снапшотов до реплик, отличий от прямой схемы репликации типа master-slave.</p>",
+                "difficulty": "GRADE_20"
+            },
+            {
+                "content": "<p>Кандидат знает про стратегии обнаружения и разрешения конфликтов, возникающих при репликации (e.g. использование таймстампов, применение последней версии).</p><p><br></p><p>Кандидат понимает trade off между задержками на операции с данными и консистентностью данных между узлами хранилища. Может объяснить, по какой стратегии выбирать подходящий вид репликации для произвольной системы.</p>",
+                "difficulty": "GRADE_21"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 710,
+                "title": "Distributed Systems"
+            },
+            {
+                "ID": 639,
+                "title": "Short Architecture Questions"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2024-07-18T11:57:47Z",
+        "interviewCount": 47,
+        "question": "<p>В хранилищах данных часто используется репликация. Сделайте обзорный рассказ о репликации: что это такое, зачем она нужна, какие виды репликации вы знаете, какие бывают сложности и проблемы.</p>",
+        "time": 15,
+        "title": "Репликация в хранилищах данных"
+    },
+    {
+        "ID": 2558,
+        "answers": [
+            {
+                "content": "<p>Получилось собрать high-level архитектуру системы. </p><p><br></p><p>Кандидат смог описать сервис для работы с графами, с CRUD API и базой данных.</p><p><br></p><p>Часть про исполнение графов вызывает трудности, кандидат не особо ориентируется в вариантах запуска произвольных скриптов и исполняемых файлов.</p><p><br></p><p>Часть со стабильностью и механиками ретраев также вызывает сложности.</p><p><br></p><p>В качестве стратегии управления ресурсами в лучшем случае предложена FIFO очередь.</p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p>Кандидат хорошо разложил большую систему на блоки: компонент для работы с графами, менеджер ресурсов кластера, планировщик, воркер для запуска вычислений на сервере. </p><p><br></p><p>Кандидат более-менее сносно описал запуск вычислительных задач, возможно отсылаясь к опыту работы со Spark, Hadoop или Kubernetes.</p><p><br></p><p>Кандидат понимает что такое идемпотентность, ретраи, и смог описать как обеспечивать надежность и мониторинг.</p><p><br></p><p>Кандидат понимает общую проблематику работы с данными, но затрудняется предложить оптимизации их доставки и обработки.</p>",
+                "difficulty": "GRADE_19"
+            },
+            {
+                "content": "<p>Кандидат более-менее уверенно описывает все части системы, возможно отсылаясь к опыту работы с Spark / Hadoop / Airflow / Kubernetes.</p><p><br></p><p>Кандидат хорошо понимает задачу распределения ресурсов в рамках вычислительного сервера, знает как устроен Docker и cgroups.</p><p><br></p><p>Кандидат понимает проблематику общего планировщика ресурсов, предложил подходы к соблюдению квот, знает о штуках типа resource preemption.</p><p><br></p><p><br></p>",
+                "difficulty": "GRADE_20"
+            },
+            {
+                "content": "<p>Кандидат уделял внимание деталям и продемонстрировал глубокие знания по данной теме. Например, рассказал про особенности использования GPU карт на сервере и шеринге ресурсов несколькими приложениями, или в деталях описал нюансы стриминга данных между источником и вычислительным сервером.</p>",
+                "difficulty": "GRADE_21"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 472,
+                "title": "System Design Tasks"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2024-07-21T18:54:38Z",
+        "interviewCount": 13,
+        "question": "<p>Мы разрабатываем внутреннюю вычислительную платформу, которая позволит нашим аналитикам, дата саентистам и разработчикам выполнять сложные рабочие процессы с данными. </p><p><br></p><p>Платформа будет поддерживать создание графов выполнения, где каждый узел (блок) графа представляет собой дискретную единицу работы. Эти блоки имеют именованные входы и выходы, которые могут включать файлы в HDFS или S3, таблицы в базе данных или другие формы хранения данных. Блок конфигурируется способом запуска: это может быть скрипт, вызов API с хендлерами /start, /stop, /status, либо исполняемый файл. Также в блоке можно настроить требования к ресурсам, таким как CPU, GPU, RAM и дисковое пространство.</p><p><br></p><p>Платформой будут пользоваться множество команд, поэтому нужна возможность настраивать квоты на потребление ресурсов.</p><p><br></p><p>Наша цель — поддерживать выполнение десятков тысяч таких графов ежедневно.</p><p><br></p><p>Опишите свой подход к проектированию и реализации этой вычислительной платформы.</p><ol><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Как бы вы спроектировали архитектуру для создания, выполнения и мониторинга этих графов выполнения?</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Какие стратегии вы бы использовали для реализации планировщика и распределителя ресурсов?</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Как бы вы обеспечили масштабируемость и надежность, учитывая большой объем выполняемых заданий?</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Как бы вы организовали обработку ошибок и обеспечили согласованность данных на всех графах выполнения?</li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Как бы вы организовали работу с данными, их доставкой до сервера, выполняющего вычисления? </li><li data-list=\"bullet\"><span class=\"ql-ui\" contenteditable=\"false\"></span>Какие механики повышения эффективности вычислений вы можете предложить?</li></ol>",
+        "time": 60,
+        "title": "Design Compute Platform"
+    },
+    {
+        "ID": 2650,
+        "answers": [
+            {
+                "content": "<p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Все номера в таблице хранятся в виде диапазонов, их возможные пересечения обрабатываются на этапе заполнения классификатора.</span></p><p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Классификация осуществляется SQL-запросом вида </span></p><p><br></p><pre class=\"ql-code-block-container\" spellcheck=\"false\"><div class=\"ql-code-block\" data-language=\"sql\"><span class=\"ql-token hljs-keyword\">SELECT</span> ... <span class=\"ql-token hljs-keyword\">FROM</span> ... <span class=\"ql-token hljs-keyword\">WHERE</span> phone <span class=\"ql-token hljs-operator\">&gt;=</span> bottom <span class=\"ql-token hljs-keyword\">AND</span> phone <span class=\"ql-token hljs-operator\">&lt;=</span> top</div></pre><p><br></p><p>Примечание: <span style=\"background-color: transparent; color: rgb(23, 43, 77);\">Оптимизция неравенства тяжелее оптимизации равенства. Требуется отдельно обрабатывать перекрытия диапазонов (особенно восстановление при удалении какого-либо перекрываемого диапазона).</span></p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Все номера в таблице хранятся в виде префиксов, явно заданные диапазоны приводятся к виду префиксов на этапе заполнения таблицы. В таблице есть вычисляемый столбец weight, значение которого равно длине префикса.</span></p><p><br></p><p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Классификация осуществляется SQL-запросом вида </span></p><p><br></p><pre class=\"ql-code-block-container\" spellcheck=\"false\"><div class=\"ql-code-block\" data-language=\"sql\"><span class=\"ql-token hljs-keyword\">SELECT</span> ... <span class=\"ql-token hljs-keyword\">FROM</span> ... <span class=\"ql-token hljs-keyword\">WHERE</span> prefix<span class=\"ql-token hljs-operator\">=</span>substr(phone,<span class=\"ql-token hljs-number\">1</span>) <span class=\"ql-token hljs-keyword\">OR</span> prefix<span class=\"ql-token hljs-operator\">=</span>substr(phone,<span class=\"ql-token hljs-number\">2</span>) ... prefix<span class=\"ql-token hljs-operator\">=</span>substr(phone,maxlen) <span class=\"ql-token hljs-keyword\">ORDER</span> <span class=\"ql-token hljs-keyword\">BY</span> weight <span class=\"ql-token hljs-keyword\">DESC</span> LIMIT <span class=\"ql-token hljs-number\">1</span></div></pre><p><br></p><p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Индекс строим по полю prefix. Строить индекс по комбинации prefix+weight смысла нет (попросить объяснить почему).</span></p><p><br></p><p>Примечание: <span style=\"background-color: transparent; color: rgb(23, 43, 77);\">Сравнение на равенство лучше поддается оптимизации SQL-сервером. Разбиение исходного номера phone на набор подстрок занимает ограниченное время (исходный номер не может содержать более 15-ти частей). Можно также заранее подготовить 15 SQL-запросов с разными параметрами при помощи prepare. Возможно добавление в классификатор новых префиксов и/или диапазонов, при этом их возможные пересечения на результат не повлияют.</span></p><p><br></p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 472,
+                "title": "System Design Tasks"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2024-08-25T15:17:11Z",
+        "interviewCount": 6,
+        "question": "<p><span style=\"background-color: rgb(255, 255, 255); color: rgb(23, 43, 77);\">Телефонные номера представляют собой текстовую строку длиной не более 15 символов, состоящую только из цифр. </span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(23, 43, 77);\">Телефонные номера имеют аттрибуты: страна и, опционально, регион. Данные для заполнения справочника телефонных номеров могут поставляться как в виде набора префиксов (prefix=\"7\"&nbsp;означает, что номер принадлежит России), так и в виде диапазонов (\"74950000000\"-\"74959999999\" — город Москва). </span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(23, 43, 77);\">Изменение справочника происходят относительно редко и не критичны ко времени обработки.</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(23, 43, 77);\">Основная задача: определение страны и региона по заданному телефонному номеру. Данная функция вызывается очень часто и, соответственно, должна оптимально использовать ресурсы SQL-сервера и выполняться максимально быстро. При наличии нескольких пересекающихся диапазонов информация должна браться из наиболее специфического (наиболее \"узкого\").</span></p><p><br></p><p>Необходимо спроектировать БД (таблицы, индексы) для хранения классификатора телефонных номеров и предложить вариант реализации классификатора заданного телефонного номера.</p>",
+        "time": 45,
+        "title": "Design phone number classifier"
+    },
+    {
+        "ID": 2649,
+        "answers": [
+            {
+                "content": "<p><span style=\"background-color: transparent; color: rgb(23, 43, 77);\">Выделение отдельного топика для каждого независимого генератора событий.</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(23, 43, 77);\">Не умение читать ТЗ: явно сказано, что \"посылаемых в единственный топик kafka\". Подразумевается, что сервис либо уже существует, либо по каким-то причинам надо отправлять все события именно в один топик. Решения необходимо предлагать не нарушая ограничений, заданных в ТЗ.</span></p>",
+                "difficulty": "GRADE_18"
+            },
+            {
+                "content": "<p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Создаем 2 микросервиса: первый является kafka consumer group, второй реализует бизнес-логику обработки сообщений. Т.к. генераторы сообщений независимые, то их можно вытаскивать внутри сервиса, являющегося kafka consumer group, и складывать во внутренние очереди обработки (будет столько очередей, сколько имеется независимых генераторов). В producer в качестве ключа сообщения используем уникальный идентификатор генератора, что гарантирует сохранение последовательности сообщений в обработчике. Фактически выполняется асинхронная предобработка потока сообщений в приемнике.</span></p><p><br></p><p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Далее каждая внутренняя очередь синхронно передает свои сообщения на обработку в бизнес-логику.</span></p><p><br></p><p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Топик разбивается на N-партиций, при этом кол-во копий сервиса, являющегося kafka consumer group, должно быть не меньше N. </span></p><p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Значение больше N является резервом на случай неработоспособности какой-либо копии сервиса (попросить объяснить, почему именно так).</span></p><p><br></p><p><span style=\"color: rgb(23, 43, 77); background-color: rgb(255, 255, 255);\">Масштабирование производится автоматически (новая очередь создается при обнаружении нового независимого источника данных) либо одновременным увеличением кол-ва партиций топика и кол-ва обработчиков consumer group.</span></p>",
+                "difficulty": "GRADE_19"
+            }
+        ],
+        "blocks": [
+            {
+                "ID": 472,
+                "title": "System Design Tasks"
+            },
+            {
+                "ID": 471,
+                "title": "Architecture (System Design)"
+            }
+        ],
+        "createdAt": "2024-08-25T15:06:27Z",
+        "interviewCount": 2,
+        "question": "<p><span style=\"background-color: transparent; color: rgb(0, 0, 0);\">Есть N виртуальных машин, на которых работают телефонные сервера. На каждый сервер поступают события о телефонных звонках, например \"вызов поступил\", \"абонент ответил\", \"начали проигрывать звуковой файл\", \"окончили проигрывать звуковой файл\", \"абонент положил трубку\". Эти события пересылаются в единственный топик Kafka, откуда они должны вычитываться и обрабатываться микросервисом, реализующим конкретные голосовые алгоритмы. Каждый поток событий должен обрабатываться в том же порядке, в котором они генерируется (к примеру, последовательность \"пришел вызов\", \"начали проигрывать приветствие\" нельзя обрабатывать в обратном порядке).</span></p><p><br></p><p><span style=\"background-color: transparent; color: rgb(0, 0, 0);\">Пример: если вызов поступил на CRM, мы должны ответить на звонок, проиграть приветствие, обратиться в CRM на предмет \"а с кем соединить этого клиента\", дозвониться тому, кого нам указала CRM и соединить эти два вызова.</span></p><p><br></p><p><span style=\"background-color: rgb(255, 255, 255); color: rgb(23, 43, 77);\">Как можно горизонтально масштабировать данную схему при увеличении нагрузки?</span></p>",
+        "time": 45,
+        "title": "Design scalability strategy for Telephony Platform"
+    }
+]
