@@ -172,3 +172,5 @@ cython_debug/
 
 create_app.sh
 .idea
+task_learn
+*.db
