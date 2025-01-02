@@ -6,10 +6,16 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.db import Base
 
 if TYPE_CHECKING:
-    from app.models.questions import Question
+    from app.models.question import Question
 
 
 class Answer(Base):
+
     content: Mapped[str] = mapped_column(Text)
     difficulty: Mapped[str] = mapped_column(String(256))
-    question: Mapped['Question'] = relationship(back_populates='answer')
+    question: Mapped['Question'] = relationship(
+        back_populates='answer',
+    )
+
+    def __repr__(self):
+        return f'{super().__repr__()}; {self.content=}; {self.difficulty=}; {self.question=}.'

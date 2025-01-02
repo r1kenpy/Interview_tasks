@@ -4,8 +4,8 @@ from sqlalchemy import Integer, String, Text, ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
-from app.models.answers import Answer
-from app.models.blocks import Block
+from app.models.answer import Answer
+from app.models.block import Block
 
 
 class Question(Base):
@@ -23,3 +23,10 @@ class Question(Base):
     )
     interview_count: Mapped[int] = mapped_column(Integer, default=0)
     time_decision: Mapped[int] = mapped_column(Integer)
+
+    def __repr__(self):
+        return (
+            f'{super().__repr__()}; {self.title=}; {self.additional=};'
+            f'[{self.answer_id=}]; [{self.block_id=}]; {self.interview_count=};'
+            f'{self.time_decision=}'
+        )
