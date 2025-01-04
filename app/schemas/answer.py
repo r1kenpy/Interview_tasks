@@ -1,19 +1,19 @@
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from app.schemas.question import QuestionDB
 
 
 class AnswerDB(BaseModel):
     id: int
-    content: Optional[str]
-    difficulty: Optional[str]
-    question: Optional[int]
+    content: str
+    difficulty: str
+    question: Optional[QuestionDB] = None
 
 
 class AnswerCreate(BaseModel):
     content: str
-    difficulty: str  # Enum or model?
-    question: Optional[int]
+    difficulty: str = Field(..., max_length=256)  # Enum or model?
 
 
 class AnswerUpdate(AnswerCreate): ...

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.core.config import settings
-from app.api.quesion import router as quesion_router
+from app.api.question import router as quesion_router
 
 app = FastAPI(title=settings.title_app)
 

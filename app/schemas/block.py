@@ -1,19 +1,18 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BlockDB(BaseModel):
-    id: str
+    id: int
     title: str
-    level: int
-    question: int
+    level: Optional[int] = None
+    question_id: int
 
 
 class BlockCreate(BaseModel):
-    title: str
-    level: Optional[int]
-    question: Optional[int]
+    title: str = Field(..., max_length=256)
+    level: Optional[int] = Field(None, ge=1)
 
 
 class BlockUpdate(BlockCreate): ...
