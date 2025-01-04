@@ -1,11 +1,7 @@
-from typing import TYPE_CHECKING
-
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional
 
 from pydantic import BaseModel, Field
-
-from app.schemas.block import BlockCreate, BlockDB
 
 
 class Answer(BaseModel):

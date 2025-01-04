@@ -1,6 +1,7 @@
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from pydantic import BaseModel, Field
+
 from app.schemas.question import QuestionDB
 
 

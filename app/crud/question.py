@@ -1,13 +1,13 @@
 from typing import Any
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm import lazyload, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.crud.base import CRUDBase
-from app.models.question import Question
 from app.models.answer import Answer
 from app.models.block import Block
+from app.models.question import Question
 from app.schemas.question import QuestionCreate, QuestionUpdate
 
 

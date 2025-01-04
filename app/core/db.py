@@ -3,12 +3,11 @@ from dataclasses import dataclass
 from sqlalchemy import Integer
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import (
-    declarative_base,
-    Mapped,
-    mapped_column,
-    declared_attr,
-    sessionmaker,
     DeclarativeBase,
+    Mapped,
+    declared_attr,
+    mapped_column,
+    sessionmaker,
 )
 
 from app.core.config import settings
