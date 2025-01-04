@@ -174,3 +174,7 @@ create_app.sh
 .idea
 task_learn
 *.db
+/fixture
+/all_tasks
+/alembic
+.DS_Store

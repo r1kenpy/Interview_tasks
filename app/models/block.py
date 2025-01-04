@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, Integer
+from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
@@ -12,8 +12,13 @@ if TYPE_CHECKING:
 class Block(Base):
 
     title: Mapped[str] = mapped_column(String(256))
-    level: Mapped[int] = mapped_column(Integer)
-    question: Mapped['Question'] = relationship(back_populates='block')
+    level: Mapped[int] = mapped_column(Integer, nullable=True)
+    question_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('question.id')
+    )
+    question_blocks: Mapped[list['Question']] = relationship(
+        back_populates='blocks'
+    )
 
     def __repr__(self):
-        return f'{super().__repr__()}; {self.title=}; {self.level=}; {self.question=}.'
+        return f'{super().__repr__()}; {self.title=}; {self.level=}; {self.question_id=}.'
