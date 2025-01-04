@@ -1,10 +1,10 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+
 from app.crud.base import CRUDBase
 from app.models.answer import Answer
 from app.schemas.answer import AnswerCreate, AnswerUpdate
-from sqlalchemy.orm import lazyload, joinedload
-
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CRUDAnswer(CRUDBase[Answer, AnswerCreate, AnswerUpdate]):

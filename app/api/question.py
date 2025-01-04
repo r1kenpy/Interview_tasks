@@ -1,17 +1,17 @@
 import logging
+
 from fastapi import APIRouter, Depends, Request
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
-from app.schemas.question import QuestionCreate, QuestionDB
-from app.schemas.answer import AnswerCreate, AnswerDB
-from app.schemas.block import BlockDB, BlockCreate
-from app.crud.question import question_crud
 from app.crud.answer import answer_crud
 from app.crud.block import block_crud
-from app.models.answer import Answer
+from app.crud.question import question_crud
+from app.schemas.answer import AnswerCreate, AnswerDB
+from app.schemas.block import BlockCreate, BlockDB
+from app.schemas.question import QuestionCreate, QuestionDB
 
 tamplates = Jinja2Templates('app/templates')
 
