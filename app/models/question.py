@@ -11,6 +11,7 @@ from app.models.block import Block
 class Question(Base):
     title: Mapped[str] = mapped_column(String(256))
     additional: Mapped[str] = mapped_column(Text, nullable=True)
+    # question: Mapped[str] = mapped_column(Text)
     answers: Mapped[list['Answer']] = relationship(
         back_populates='question_answers'
     )
