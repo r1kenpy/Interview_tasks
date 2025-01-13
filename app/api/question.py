@@ -37,13 +37,18 @@ async def a_form(
 
 @router.get('/', response_class=HTMLResponse)
 async def index(
-    request: Request, session: AsyncSession = Depends(get_async_session)
+    request: Request,
+    bt: str = None,
+    session: AsyncSession = Depends(get_async_session),
 ):
-    blocks = await block_crud.get_multi(session)
+    all_blocks = await block_crud.get_multi(session)
     context = {
         'request': request,
-        'blocks': blocks,
+        'blocks': all_blocks,
     }
+    if bt is not None:
+        questions = await block_crud.get_multy_by_title(session, bt)
+        context['questions'] = questions
     return tamplates.TemplateResponse('index.html', context)
 
 

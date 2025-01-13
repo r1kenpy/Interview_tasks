@@ -13,6 +13,7 @@ class BlockDB(BaseModel):
 class BlockCreate(BaseModel):
     title: str = Field(..., max_length=256)
     level: Optional[int] = Field(None, ge=1)
+    question_id: int = Field(..., ge=1)
 
 
 class BlockUpdate(BlockCreate): ...

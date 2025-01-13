@@ -28,10 +28,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj.scalars().first()
 
     async def create(
-        self, session: AsyncSession, obj_data: CreateSchemaType, question_id
+        self, session: AsyncSession, obj_data: CreateSchemaType
     ) -> ModelType:
         obj_data = obj_data.model_dump(exclude_none=True)
-        obj_data['question_id'] = question_id
+
         new_obj_db = self.model(**obj_data)
         session.add(new_obj_db)
         await session.commit()

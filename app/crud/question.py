@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.crud.base import CRUDBase
+from app.crud.block import block_crud
 from app.models.answer import Answer
 from app.models.block import Block
 from app.models.question import Question
@@ -46,7 +47,14 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         for answer in answers:
             new_obj_in_db.answers.append(Answer(**answer))
         for block in blocks:
-            new_obj_in_db.blocks.append(Block(**block))
+            block_exists = await block_crud.get_by_title(
+                session, block.get('title')
+            )
+            if block_exists:
+                # Нужно делать МтоМ
+                new_obj_in_db.blocks.append(block_exists)
+            else:
+                new_obj_in_db.blocks.append(Block(**block))
         session.add(new_obj_in_db)
         await session.commit()
         await session.refresh(new_obj_in_db)
