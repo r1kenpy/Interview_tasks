@@ -28,12 +28,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj.scalars().first()
 
     async def create(
-        self, session: AsyncSession, obj_data: CreateSchemaType
+        self,
+        session: AsyncSession,
+        obj_data: CreateSchemaType,
+        exclude_b_a=False,
     ) -> ModelType:
         obj_data = obj_data.model_dump(exclude_none=True)
-
+        if exclude_b_a:
+            del obj_data['blocks']
+            del obj_data['answers']
         new_obj_db = self.model(**obj_data)
         session.add(new_obj_db)
-        await session.commit()
-        await session.refresh(new_obj_db)
+        # await session.commit()
+        # await session.refresh(new_obj_db)
         return new_obj_db
