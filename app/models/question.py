@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -7,16 +8,19 @@ from app.core.db import Base
 from app.models.answer import Answer
 from app.models.block import Block
 
+if TYPE_CHECKING:
+    from app.models.association import Association
+
 
 class Question(Base):
     title: Mapped[str] = mapped_column(String(256))
     additional: Mapped[str] = mapped_column(Text, nullable=True)
-    # question: Mapped[str] = mapped_column(Text)
+    text_question: Mapped[str] = mapped_column(Text)
     answers: Mapped[list['Answer']] = relationship(
         back_populates='question_answers'
     )
-    blocks: Mapped[list['Block']] = relationship(
-        back_populates='question_blocks'
+    blocks: Mapped[list['Association']] = relationship(
+        back_populates='question'
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,

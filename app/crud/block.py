@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.crud.base import CRUDBase
 from app.models.block import Block
@@ -23,9 +23,9 @@ class CRUDBlock(CRUDBase[Block, BlockCreate, BlockUpdate]):
         all_blocks = await session.execute(
             select(self.model)
             .where(self.model.title == title)
-            .options(joinedload(self.model.question_blocks))
+            .options(joinedload(self.model.questions))
         )
-        return all_blocks.scalars().all()
+        return all_blocks.scalars().unique().all()
 
 
 block_crud = CRUDBlock(Block)
