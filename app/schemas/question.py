@@ -10,7 +10,7 @@ class Answer(BaseModel):
 
 
 class Block(BaseModel):
-    id: int
+    id: Optional[int] = None
     title: str = Field(..., max_length=256)
     level: Optional[int] = Field(None, ge=1)
 
@@ -33,10 +33,12 @@ class QuestionDB(BaseModel):
 
 class QuestionCreate(BaseModel):
     title: str
-    additional: Optional[str] = Field(None, max_length=256)
+    additional: Optional[str] = None
+    text_question: str
     answers: Optional[list[Answer]] = None
     blocks: Optional[list[Block]] = None
     time_decision: int = Field(..., ge=1)
+    interview_count: Optional[int] = Field(None, ge=0)
 
 
 class QuestionUpdate(QuestionCreate): ...

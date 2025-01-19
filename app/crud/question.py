@@ -56,26 +56,28 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         self,
         session: AsyncSession,
         obj_data: QuestionCreate,
-    ) -> tuple[Question, dict[str, Any]]:
-        obj_data = obj_data.model_dump(exclude_none=True)
-        answers = obj_data.pop('answers')
-        blocks = obj_data.pop('blocks')
-        new_obj_in_db = self.model(**obj_data)
-        for answer in answers:
-            new_obj_in_db.answers.append(Answer(**answer))
-        for block in blocks:
-            block_exists = await block_crud.get_by_title(
+    ) -> Question:
+        data = obj_data.model_dump(exclude_none=True)
+        data_answer = data.pop('answers')
+        data_blocks = data.pop('blocks')
+        print(data)
+        new_question = self.model(**data)
+        for answer in data_answer:
+            new_question.answers.append(Answer(**answer))
+
+        for block in data_blocks:
+            block_for_assoc = await block_crud.get_by_title(
                 session, block.get('title')
             )
-            if block_exists:
-                # Нужно делать МтоМ
-                new_obj_in_db.blocks.append(block_exists)
-            else:
-                new_obj_in_db.blocks.append(Block(**block))
-        session.add(new_obj_in_db)
+            if block_for_assoc is None:
+                block_for_assoc = Block(**data_blocks[0])
+
+            new_question.blocks.append(Association(block=block_for_assoc))
+
+        session.add(new_question)
         await session.commit()
-        await session.refresh(new_obj_in_db)
-        return new_obj_in_db
+        await session.refresh(new_question)
+        return new_question
 
 
 question_crud = CRUDQuestion(Question)
