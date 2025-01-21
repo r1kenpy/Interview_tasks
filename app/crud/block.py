@@ -23,7 +23,7 @@ class CRUDBlock(CRUDBase[Block, BlockCreate, BlockUpdate]):
         all_blocks = await session.execute(
             select(self.model)
             .where(self.model.title == title)
-            .options(joinedload(self.model.questions))
+            .options(selectinload(self.model.questions))
         )
         return all_blocks.scalars().unique().all()
 

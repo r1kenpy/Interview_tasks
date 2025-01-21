@@ -19,12 +19,17 @@ class Assoc(BaseModel):
     block: Block
 
 
+class Category(BaseModel):
+    title: str = Field(..., max_length=256)
+
+
 class QuestionDB(BaseModel):
     id: int
     title: str = Field(..., max_length=256)
     additional: Optional[str] = None
     text_question: str
     answers: Optional[list[Answer]] = None
+    category: Optional[Category] = None
     blocks: Optional[list[Assoc]] = None
     created_at: datetime
     interview_count: Optional[int] = Field(None, ge=0)
@@ -36,6 +41,7 @@ class QuestionCreate(BaseModel):
     additional: Optional[str] = None
     text_question: str
     answers: Optional[list[Answer]] = None
+    category: Optional[Category] = None
     blocks: Optional[list[Block]] = None
     time_decision: Optional[int] = Field(None, ge=1)
     interview_count: Optional[int] = Field(None, ge=0)

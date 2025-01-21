@@ -1,4 +1,6 @@
 import logging
+from pprint import pprint
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
@@ -8,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.crud.answer import answer_crud
 from app.crud.block import block_crud
+from app.crud.category import category_crud
 from app.crud.question import question_crud
 from app.models.answer import Answer
 from app.models.association import Association
@@ -42,20 +45,27 @@ async def a_form(
 @router.get('/', response_class=HTMLResponse)
 async def index(
     request: Request,
-    bt: str = None,
+    category_id: Optional[int] = None,
     session: AsyncSession = Depends(get_async_session),
 ):
+
     all_blocks = await block_crud.get_multi(session)
+    all_categories = await category_crud.get_multi(session)
     context = {
         'request': request,
         'blocks': all_blocks,
+        'categories': all_categories,
     }
-    if bt is not None:
-        questions = await block_crud.get_multy_by_title(session, bt)
+
+    if category_id is not None:
+        questions = await question_crud.get_multy_by_category_id(
+            session, category_id
+        )
         context['questions'] = questions
     else:
         questions = await question_crud.get_multi_v2(session)
         context['questions'] = questions
+
     return tamplates.TemplateResponse('index.html', context)
 
 

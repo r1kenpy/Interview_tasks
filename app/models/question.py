@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
 from app.models.answer import Answer
-from app.models.block import Block
 
 if TYPE_CHECKING:
     from app.models.association import Association
+    from app.models.category import Category
 
 
 class Question(Base):
@@ -19,6 +19,8 @@ class Question(Base):
     answers: Mapped[list['Answer']] = relationship(
         back_populates='question_answers'
     )
+    category_id: Mapped[int] = mapped_column(ForeignKey('category.id'))
+    category: Mapped['Category'] = relationship(back_populates='question')
     blocks: Mapped[list['Association']] = relationship(
         back_populates='question'
     )
@@ -37,5 +39,5 @@ class Question(Base):
         return (
             f'{super().__repr__()}; {self.title=}; {self.additional=};'
             f'{self.interview_count=};'
-            f'{self.time_decision=}'
+            f'{self.time_decision=}; {self.category_id}'
         )
