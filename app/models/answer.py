@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class Answer(Base):
 
     content: Mapped[str] = mapped_column(Text)
-    difficulty: Mapped[str] = mapped_column(String(256))
+    difficulty: Mapped[str] = mapped_column(String(256), nullable=True)
     question_id: Mapped[int] = mapped_column(
         Integer, ForeignKey('question.id')
     )

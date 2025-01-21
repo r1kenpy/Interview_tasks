@@ -178,3 +178,5 @@ task_learn
 /all_tasks
 /alembic
 .DS_Store
+.vscode
+tz.md

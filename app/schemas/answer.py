@@ -14,7 +14,7 @@ class AnswerDB(BaseModel):
 
 class AnswerCreate(BaseModel):
     content: str
-    difficulty: str = Field(..., max_length=256)  # Enum or model?
+    difficulty: Optional[str] = Field(None, max_length=256)  # Enum or model?
 
 
 class AnswerUpdate(AnswerCreate): ...

@@ -69,10 +69,13 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
             block_for_assoc = await block_crud.get_by_title(
                 session, block.get('title')
             )
-            if block_for_assoc is None:
-                block_for_assoc = Block(**data_blocks[0])
-
-            new_question.blocks.append(Association(block=block_for_assoc))
+            print(block)
+            print('*' * 100)
+            if not block_for_assoc:
+                block_for_assoc = Block(**block)
+                new_question.blocks.append(Association(block=block_for_assoc))
+            else:
+                new_question.blocks.append(Association(block=block_for_assoc))
 
         session.add(new_question)
         await session.commit()

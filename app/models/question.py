@@ -29,7 +29,9 @@ class Question(Base):
     interview_count: Mapped[int] = mapped_column(
         Integer, default=0, nullable=True
     )
-    time_decision: Mapped[int] = mapped_column(Integer, default=10)
+    time_decision: Mapped[int] = mapped_column(
+        Integer, default=10, nullable=True
+    )
 
     def __repr__(self):
         return (

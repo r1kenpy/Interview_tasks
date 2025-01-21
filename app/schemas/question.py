@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 class Answer(BaseModel):
     content: str
-    difficulty: str | None
+    difficulty: Optional[str] = None
 
 
 class Block(BaseModel):
@@ -28,7 +28,7 @@ class QuestionDB(BaseModel):
     blocks: Optional[list[Assoc]] = None
     created_at: datetime
     interview_count: Optional[int] = Field(None, ge=0)
-    time_decision: int = Field(..., ge=0)
+    time_decision: Optional[int] = Field(None, ge=0)
 
 
 class QuestionCreate(BaseModel):
@@ -37,7 +37,7 @@ class QuestionCreate(BaseModel):
     text_question: str
     answers: Optional[list[Answer]] = None
     blocks: Optional[list[Block]] = None
-    time_decision: int = Field(..., ge=1)
+    time_decision: Optional[int] = Field(None, ge=1)
     interview_count: Optional[int] = Field(None, ge=0)
 
 
