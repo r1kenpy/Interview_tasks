@@ -1,9 +1,8 @@
 import logging
-from pprint import pprint
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,12 +11,6 @@ from app.crud.answer import answer_crud
 from app.crud.block import block_crud
 from app.crud.category import category_crud
 from app.crud.question import question_crud
-from app.models.answer import Answer
-from app.models.association import Association
-from app.models.block import Block
-from app.models.question import Question
-from app.schemas.answer import AnswerCreate, AnswerDB
-from app.schemas.block import BlockCreate, BlockDB
 from app.schemas.question import QuestionCreate, QuestionDB
 
 tamplates = Jinja2Templates('app/templates')
@@ -31,17 +24,6 @@ logger.addHandler(logging.StreamHandler())
 logger.level = logging.DEBUG
 
 
-@router.get('/a_form_link/', response_class=HTMLResponse)
-async def a_form(
-    request: Request, session: AsyncSession = Depends(get_async_session)
-):
-    # all = await answer_crud.get_multi_with_question(session)
-    all = await question_crud.get_multi_v2(session)
-    context = {'request': request, 'all': all}
-
-    return tamplates.TemplateResponse('form.html', context)
-
-
 @router.get('/', response_class=HTMLResponse)
 async def index(
     request: Request,
@@ -49,11 +31,9 @@ async def index(
     session: AsyncSession = Depends(get_async_session),
 ):
 
-    all_blocks = await block_crud.get_multi(session)
     all_categories = await category_crud.get_multi(session)
     context = {
         'request': request,
-        'blocks': all_blocks,
         'categories': all_categories,
     }
 
@@ -61,62 +41,70 @@ async def index(
         questions = await question_crud.get_multy_by_category_id(
             session, category_id
         )
-        context['questions'] = questions
     else:
         questions = await question_crud.get_multi_v2(session)
-        context['questions'] = questions
 
+    context['questions'] = questions
+    difficulty = set()
+    for questions in questions:
+
+        for answer in questions.answers:
+            if answer.difficulty is None:
+                difficulty.add('Сложность отсутствует')
+                continue
+            difficulty.add(answer.difficulty)
+
+    context['difficulty'] = sorted(difficulty)
     return tamplates.TemplateResponse('index.html', context)
 
 
-@router.get('/all_q', response_model=list[QuestionDB])
-async def get_all(session: AsyncSession = Depends(get_async_session)):
-    all = await question_crud.get_multi_v2(session)
-    return all
-
-
-@router.post(
-    '/question', response_model=QuestionDB, response_model_exclude_none=True
-)
-async def create_Q(
-    data: QuestionCreate,
+@router.post('/', response_class=HTMLResponse)
+async def index(
+    request: Request,
     session: AsyncSession = Depends(get_async_session),
 ):
-    new_db = await question_crud.create_v2(session, data)
-    new_db = await question_crud.get_by_id_with_answer(session, new_db.id)
-    return new_db
+    dif = await answer_crud.get_all_difficulty(session)
+    context = {
+        'request': request,
+    }
+    return tamplates.TemplateResponse('index.html', context)
 
 
-@router.post(
-    '/answer', response_model=AnswerDB, response_model_exclude_none=True
-)
-async def create_A(
-    data: AnswerCreate,
+@router.get('/answers_dif')
+async def answers_dif(session: AsyncSession = Depends(get_async_session)):
+    ddd = await answer_crud.get_all_difficulty(session)
+    for i in ddd:
+        print(i.id)
+    return None
+
+
+@router.get('/block/', response_class=HTMLResponse)
+async def block(
+    request: Request,
+    block_id: Optional[int] = None,
     session: AsyncSession = Depends(get_async_session),
 ):
-    new_db = await answer_crud.create(session, data)
-    await session.commit()
-    await session.refresh(new_db)
-    return new_db
+    context = {
+        'request': request,
+        'categories': await category_crud.get_multi(session),
+    }
+    if block_id is not None:
+        context['questions'] = await question_crud.get_question_by_block(
+            session, block_id
+        )
+    # print(block_id)
+    # print(context.get('questions'))
+    difficulty = set()
+    for questions in context.get('questions'):
 
+        for answer in questions.answers:
+            if answer.difficulty is None:
+                difficulty.add('Сложность отсутствует')
+                continue
+            difficulty.add(answer.difficulty)
 
-@router.get('/answer', response_model=list[AnswerDB])
-async def get_all_answers(session: AsyncSession = Depends(get_async_session)):
-    all_ = await answer_crud.get_multi_with_question(session)
-    return all_
-
-
-@router.post(
-    '/block', response_model=BlockDB, response_model_exclude_none=True
-)
-async def create_B(
-    data: BlockCreate,
-    session: AsyncSession = Depends(get_async_session),
-):
-    new_db = await block_crud.create(session, data)
-    await session.commit()
-    await session.refresh(new_db)
-    return new_db
+    context['difficulty'] = sorted(difficulty)
+    return tamplates.TemplateResponse('index.html', context=context)
 
 
 @router.post('/create_question')

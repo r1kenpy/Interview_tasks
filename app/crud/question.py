@@ -1,6 +1,6 @@
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -36,7 +36,12 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         all_questions = await session.execute(
             select(self.model)
             .where(self.model.category_id == category_id)
-            .options(joinedload(self.model.answers))
+            .options(
+                joinedload(self.model.answers),
+                selectinload(self.model.blocks).options(
+                    joinedload(Association.block)
+                ),
+            )
         )
         return all_questions.scalars().unique().all()
 
@@ -104,6 +109,28 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         await session.commit()
         await session.refresh(new_question)
         return new_question
+
+    async def get_question_by_block(
+        self, session: AsyncSession, block_id: int
+    ) -> list[Question]:
+
+        questions = await session.execute(
+            select(self.model)
+            .where(
+                and_(
+                    Association.block_id == block_id,
+                    Association.question_id == self.model.id,
+                )
+            )
+            .options(
+                joinedload(self.model.answers),
+                joinedload(self.model.blocks).options(
+                    joinedload(Association.block),
+                ),
+            )
+        )
+
+        return questions.scalars().unique().all()
 
 
 question_crud = CRUDQuestion(Question)
