@@ -1,0 +1,10 @@
+<div class="list-group col-2 shadow p-3 mb-5 bg-body-tertiary rounded" style="margin-top:10px">
+
+    {% for category in categories %}
+
+        {{ category_id }}
+       <a href="{{ url_for('index') }}?category_id={{ category.id }}" class="list-group-item list-group-item-action {% if category.id==request.query_params.get('category_id')|int %} active {% endif %}" aria-current="true">
+       {{ category.title }}
+       </a>
+    {% endfor %}
+</div>

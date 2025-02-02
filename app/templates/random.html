@@ -1,0 +1,82 @@
+{% extends "base.html" %} 
+
+{% block title %}Случайный вопрос{% endblock %}
+
+
+{% block content %}
+    <div style="margin-bottom:10px;padding:10px;box-shadow: 0px 0px 5px 0px rgba(211, 211, 211, 0.87);">
+        <span>Сортировка по грейдам</span>
+        <form action="{{ url_for('random_question') }}" method="POST" style="margin-top:5px">
+            <div class="input-group">
+                <select class="form-select" id="category_id" name="category_id" onchange="getURLForRandomQuestion()">
+                {% if selected_category == none %} 
+                    <option selected>Все категории</option>
+                {% else %}
+                    <option selected value="{{ selected_category.id }}">{{ selected_category.title }}</option>
+                {% endif %} 
+                
+                {% for category in categories %}
+                    {% if selected_category.title != category.title %}
+                        <option id="{{ category.id }}" value="{{ category.id }}">{{ category.title }}</option>
+                    {% else %}
+                        <option value="0">Все категории</option>
+                    {% endif %}
+                {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    
+    <div  style="top: 8%;left:2%;right:2%;">
+        <div style="padding:5px;">
+            <h5>Вопрос: {{ question.title }}<span class="badge text-bg-secondary" style="margin-left:5px" >{{ question.interview_count }}</span></h5>
+        </div>
+        <div style="color: black; border-bottom:1px solid black; padding:5px;">
+                    {% for block in question.blocks|reverse %}
+                        <button class="btn btn-success " style="font-size:13px" type="submit" aria-expanded="false" aria-controls="collapseExample">
+                            <a href="{{ url_for('block') }}?block_id={{ block.block_id }}" style="color:white; " class="{% if block.block_id==request.query_params.get('block_id')|int %} active {% endif %}" aria-current="true">{{ block.block.title }}</a>
+                        </button>
+                        
+                        {% if not loop.last %}
+                            <span>-></span>
+                        {% endif %}
+
+                    {% endfor %}
+        </div>
+        {{ question.text_question|safe }}
+        <div> 
+            {% for answer in question.answers %}
+            
+                <p class="d-inline-flex gap-1">
+                    <button class="btn btn-primary" style="margin-left:5px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ question.id }}_{{ answer.difficulty }}" aria-expanded="false" aria-controls="collapseExample">
+                        {% if answer.difficulty == none %}
+                            Показать ответ
+                        {% else %}
+                            Показать ответ для: {{ answer.difficulty }}
+                        {% endif %}
+                        
+                    </button>
+                </p>
+                <div class="collapse" id="{{ question.id }}_{{ answer.difficulty }}">
+                    <div class="card card-body">
+                        {{ answer.content|safe }}
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+        {% if question.additional != none %}
+            <div>
+                <button class="btn btn-primary" style="margin-left:5px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ question.id }}" aria-expanded="false" aria-controls="collapseExample">
+                    Показать дополнительные вопросы         
+                </button>
+            </div>
+            <div class="collapse" id="{{ question.id }}">
+                <div class="card card-body">
+                    {{ question.additional|safe }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,8 +1,7 @@
-from typing import Any
-
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.sql.expression import func
 
 from app.crud.base import CRUDBase
 from app.crud.block import block_crud
@@ -131,6 +130,34 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         )
 
         return questions.scalars().unique().all()
+
+    async def get_random_question(
+        self, session: AsyncSession, category_id: int | None = None
+    ) -> Question:
+        if category_id is None:
+            question = await session.execute(
+                select(self.model)
+                .options(
+                    joinedload(self.model.answers),
+                    joinedload(self.model.blocks).options(
+                        joinedload(Association.block),
+                    ),
+                )
+                .order_by(func.random())
+            )
+        else:
+            question = await session.execute(
+                select(self.model)
+                .where(self.model.category_id == category_id)
+                .options(
+                    joinedload(self.model.answers),
+                    joinedload(self.model.blocks).options(
+                        joinedload(Association.block),
+                    ),
+                )
+                .order_by(func.random())
+            )
+        return question.scalar()
 
 
 question_crud = CRUDQuestion(Question)

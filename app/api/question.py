@@ -92,8 +92,6 @@ async def block(
         context['questions'] = await question_crud.get_question_by_block(
             session, block_id
         )
-    # print(block_id)
-    # print(context.get('questions'))
     difficulty = set()
     for questions in context.get('questions'):
 
@@ -105,6 +103,51 @@ async def block(
 
     context['difficulty'] = sorted(difficulty)
     return tamplates.TemplateResponse('index.html', context=context)
+
+
+@router.get('/random', response_class=HTMLResponse)
+async def random_question(
+    request: Request,
+    category_id: int | None = None,
+    session: AsyncSession = Depends(get_async_session),
+):
+    if category_id != 0:
+        question = await question_crud.get_random_question(
+            session, category_id
+        )
+    else:
+        question = await question_crud.get_random_question(session)
+    context = {
+        'question': question,
+        'request': request,
+        'categories': await category_crud.get_multi(session),
+    }
+    context['selected_category'] = None
+    if category_id != 0:
+        context['selected_category'] = question.category
+    else:
+        context['selected_category'] = None
+
+    return tamplates.TemplateResponse('random.html', context=context)
+
+
+# OLD
+# @router.post('/random', response_class=HTMLResponse)
+# async def random_question(
+#     requset: Request,
+#     category_id: int = Form(False),
+#     session: AsyncSession = Depends(get_async_session),
+# ):
+#     question = await question_crud.get_random_question(session, category_id)
+#     context = {
+#         'request': requset,
+#         'question': question,
+#         'categories': await category_crud.get_multi(session),
+#     }
+#     context['selected_category'] = None
+#     if category_id != 0:
+#         context['selected_category'] = question.category
+#     return tamplates.TemplateResponse('random.html', context=context)
 
 
 @router.post('/create_question')
