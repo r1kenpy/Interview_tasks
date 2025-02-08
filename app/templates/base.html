@@ -31,15 +31,20 @@
 
         function getURLForRandomQuestion()
     {  
-        var e = document.getElementById("category_id");
-        var value = e.value;
-
-        relativeURL = "http://127.0.0.1:8000/random/?category_id=" + value;
-        const absoluteURL = 
-        new URL(relativeURL, window.location.href);
+        var e = document.getElementById("category_id").value;
+        let absoluteURL = new URL(window.location.href);
+        absoluteURL.searchParams.set("category_id", e)
         window.location.href = absoluteURL;
         
-    }
+    };
+
+    function getURLForGradeQuestions() 
+    {
+        let grade = document.getElementById('difficulty').value;
+        let absoluteURL = new URL(window.location.href);
+        absoluteURL.searchParams.set("grade", grade);
+        window.location.href  = absoluteURL;
+    };
     </script>
 
 </footer>

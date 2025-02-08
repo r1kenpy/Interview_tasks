@@ -131,7 +131,10 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         return questions.scalars().unique().all()
 
     async def get_random_question(
-        self, session: AsyncSession, category_id: int | None = None
+        self,
+        session: AsyncSession,
+        category_id: int | None = None,
+        grade: str | None = None,
     ) -> Question:
         query = (
             select(self.model)
@@ -144,12 +147,16 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
             .order_by(func.random())
         )
 
-        if category_id is None:
-            question = await session.execute(query)
-        else:
-            question = await session.execute(
-                query.where(self.model.category_id == category_id)
+        if category_id is not None:
+            query = query.where(self.model.category_id == category_id)
+        if grade is not None:
+            query = query.where(
+                and_(
+                    Answer.difficulty == grade,
+                    Answer.question_id == self.model.id,
+                )
             )
+        question = await session.execute(query)
         return question.scalar()
 
 

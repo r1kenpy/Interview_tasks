@@ -13,7 +13,7 @@
             <span>Сортировка по грейдам</span>
             <form action="{{ url_for('index') }}" method="POST" style="margin-top:5px">
                 <div class="input-group">
-                    <select class="form-select" id="inputGroupSelect04" aria-label="Example select with button addon">
+                    <select class="form-select" id="difficulty" onchange="getURLForGradeQuestions()">
                     <option selected>Все грейды</option>
                     {% for dif in difficulty %}
 

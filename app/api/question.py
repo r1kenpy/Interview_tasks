@@ -1,14 +1,13 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, Depends, Request
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
 from app.crud.answer import answer_crud
-from app.crud.block import block_crud
 from app.crud.category import category_crud
 from app.crud.question import question_crud
 from app.schemas.question import QuestionCreate, QuestionDB
@@ -93,9 +92,9 @@ async def block(
             session, block_id
         )
     difficulty = set()
-    for questions in context.get('questions'):
+    for question in context.get('questions'):
 
-        for answer in questions.answers:
+        for answer in question.answers:
             if answer.difficulty is None:
                 difficulty.add('Сложность отсутствует')
                 continue
@@ -105,18 +104,17 @@ async def block(
     return tamplates.TemplateResponse('index.html', context=context)
 
 
-@router.get('/random', response_class=HTMLResponse)
+@router.get('/random/', response_class=HTMLResponse)
 async def random_question(
     request: Request,
     category_id: int | None = None,
+    grade: str | None = None,
     session: AsyncSession = Depends(get_async_session),
 ):
-    if category_id != 0:
-        question = await question_crud.get_random_question(
-            session, category_id
-        )
-    else:
-        question = await question_crud.get_random_question(session)
+
+    question = await question_crud.get_random_question(
+        session, category_id, grade
+    )
     context = {
         'question': question,
         'request': request,
@@ -128,26 +126,11 @@ async def random_question(
     else:
         context['selected_category'] = None
 
+    # Нужно создать таблицу difficulties и забирать уровень сложности,
+    #   который присутствует в ответах определенной категории вопроса.
+    # context['difficulties'] = await difficulties_crud.get_multi(session, category_id)
+
     return tamplates.TemplateResponse('random.html', context=context)
-
-
-# OLD
-# @router.post('/random', response_class=HTMLResponse)
-# async def random_question(
-#     requset: Request,
-#     category_id: int = Form(False),
-#     session: AsyncSession = Depends(get_async_session),
-# ):
-#     question = await question_crud.get_random_question(session, category_id)
-#     context = {
-#         'request': requset,
-#         'question': question,
-#         'categories': await category_crud.get_multi(session),
-#     }
-#     context['selected_category'] = None
-#     if category_id != 0:
-#         context['selected_category'] = question.category
-#     return tamplates.TemplateResponse('random.html', context=context)
 
 
 @router.post('/create_question')

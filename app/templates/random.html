@@ -23,6 +23,22 @@
                     {% endif %}
                 {% endfor %}
                 </select>
+
+                <select class="form-select" id="difficulty" name="difficulty" onchange="getURLForGradeQuestions()">
+                    {# {% if selected_difficulty == none %} 
+                        <option selected>Все категории</option>
+                    {% else %}
+                        <option selected value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
+                    {% endif %} 
+                     #}
+                    {% for diff in difficulty %}
+                        {# {% if selected_difficulty != category.title %} #}
+                            <option id="{{ diff}}" value="{{ diff }}">{{ diff }}</option>
+                        {# {% else %} #}
+                            <option value="0">Все категории</option>
+                        {# {% endif %} #}
+                    {% endfor %}
+                </select>
             </div>
         </form>
     </div>
