@@ -23,7 +23,7 @@ class Base(DeclarativeBase):
         return cls.__name__.lower()
 
 
-engine = create_async_engine(settings.database_url, echo=True)
+engine = create_async_engine(settings.database_url, echo=False)
 
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession)
 

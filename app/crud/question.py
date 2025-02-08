@@ -48,7 +48,6 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         all_obj = await session.execute(
             select(self.model).options(
                 joinedload(self.model.answers),
-                joinedload(self.model.category),
                 selectinload(self.model.blocks).options(
                     joinedload(Association.block)
                 ),
@@ -134,28 +133,22 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
     async def get_random_question(
         self, session: AsyncSession, category_id: int | None = None
     ) -> Question:
-        if category_id is None:
-            question = await session.execute(
-                select(self.model)
-                .options(
-                    joinedload(self.model.answers),
-                    joinedload(self.model.blocks).options(
-                        joinedload(Association.block),
-                    ),
-                )
-                .order_by(func.random())
+        query = (
+            select(self.model)
+            .options(
+                joinedload(self.model.answers),
+                joinedload(self.model.blocks).options(
+                    joinedload(Association.block),
+                ),
             )
+            .order_by(func.random())
+        )
+
+        if category_id is None:
+            question = await session.execute(query)
         else:
             question = await session.execute(
-                select(self.model)
-                .where(self.model.category_id == category_id)
-                .options(
-                    joinedload(self.model.answers),
-                    joinedload(self.model.blocks).options(
-                        joinedload(Association.block),
-                    ),
-                )
-                .order_by(func.random())
+                query.where(self.model.category_id == category_id)
             )
         return question.scalar()
 
