@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
@@ -6,10 +8,12 @@ from sqlalchemy.sql.expression import func
 from app.crud.base import CRUDBase
 from app.crud.block import block_crud
 from app.crud.category import category_crud
+from app.crud.difficulty import difficulty_crud
 from app.models.answer import Answer
 from app.models.association import Association
 from app.models.block import Block
 from app.models.category import Category
+from app.models.difficulty import Difficulty
 from app.models.question import Question
 from app.schemas.question import QuestionCreate, QuestionUpdate
 
@@ -60,7 +64,9 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
             select(self.model)
             .where(self.model.id == id)
             .options(
-                joinedload(self.model.answers),
+                joinedload(self.model.answers).options(
+                    joinedload(Answer.difficulty)
+                ),
                 joinedload(self.model.category),
                 selectinload(self.model.blocks).options(
                     joinedload(Association.block)
@@ -74,10 +80,10 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
         session: AsyncSession,
         obj_data: QuestionCreate,
     ) -> Question:
-        data = obj_data.model_dump(exclude_none=True)
-        data_answer = data.pop('answers')
-        data_blocks = data.pop('blocks')
-        data_category = data.pop('category')
+        data: dict[str, Any] = obj_data.model_dump(exclude_none=True)
+        data_answer: list[dict[str, str]] = data.pop('answers')
+        data_blocks: list[dict[str, Any]] = data.pop('blocks')
+        data_category: dict[str, str] = data.pop('category')
 
         category_in_db = await category_crud.get_category_by_title(
             session, data_category.get('title')
@@ -85,23 +91,34 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
 
         if not category_in_db:
             data['category'] = Category(**data_category)
-
         else:
             data['category_id'] = category_in_db.id
 
         new_question = self.model(**data)
+
+        # Добавление ответов к вопросу
         for answer in data_answer:
+            difficulty = answer.pop('difficulty')
+            difficulty_in_db = await difficulty_crud.get_by_title(
+                session, title=difficulty
+            )
+
+            if not difficulty_in_db:
+                answer['difficulty'] = Difficulty(title=difficulty)
+            else:
+                answer['difficulty_id'] = difficulty_in_db.id
+
             new_question.answers.append(Answer(**answer))
 
+        # Добавление блоков к вопросу
         for block in data_blocks:
-            titl = block.get('title')
             block_for_assoc = await block_crud.get_by_title(
                 session, block.get('title')
             )
             if not block_for_assoc:
-                new_question.blocks.append(Association(block=Block(**block)))
-            else:
-                new_question.blocks.append(Association(block=block_for_assoc))
+                block_for_assoc = Block(**block)
+
+            new_question.blocks.append(Association(block=block_for_assoc))
 
         session.add(new_question)
         await session.commit()

@@ -33,13 +33,13 @@ for addres in files:
                             m = i['level']
                             d['category'] = {'title': i['title']}
 
-            response = requests.post(
-                'http://127.0.0.1:8000/create_question', json=d
-            )
-            if response.status_code != 200:
-                count += 1
+            # response = requests.post(
+            #     'http://127.0.0.1:8000/create_question', json=d
+            # )
+            # if response.status_code != 200:
+            #     count += 1
 
-# with open(
-#     f'fixture/{addres.split('.')[0]}_db_v2.json', 'w', encoding='utf-8'
-# ) as f:
-#     json.dump(tasks_for_db, f, ensure_ascii=False, indent=2)
+with open(
+    f'fixture/{addres.split('.')[0]}_db_v2.json', 'w', encoding='utf-8'
+) as f:
+    json.dump(tasks_for_db, f, ensure_ascii=False, indent=2)

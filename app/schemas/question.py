@@ -4,9 +4,19 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+class Difficulty(BaseModel):
+    id: int
+    title: str
+
+
 class Answer(BaseModel):
     content: str
-    difficulty: Optional[str] = None
+    difficulty: str
+
+
+class AnswerDB(BaseModel):
+    content: str
+    difficulty: Difficulty
 
 
 class Block(BaseModel):
@@ -28,7 +38,7 @@ class QuestionDB(BaseModel):
     title: str = Field(..., max_length=256)
     additional: Optional[str] = None
     text_question: str
-    answers: Optional[list[Answer]] = None
+    answers: Optional[list[AnswerDB]] = None
     category: Optional[Category] = None
     blocks: Optional[list[Assoc]] = None
     created_at: datetime
