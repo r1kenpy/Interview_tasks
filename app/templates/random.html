@@ -25,18 +25,16 @@
                 </select>
 
                 <select class="form-select" id="difficulty" name="difficulty" onchange="getURLForGradeQuestions()">
-                    {# {% if selected_difficulty == none %} 
-                        <option selected>Все категории</option>
-                    {% else %}
-                        <option selected value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
+                    {% if selected_difficulty == none %} 
+                        <option selected>Любая сложность</option>
                     {% endif %} 
-                     #}
-                    {% for diff in difficulty %}
-                        {# {% if selected_difficulty != category.title %} #}
-                            <option id="{{ diff}}" value="{{ diff }}">{{ diff }}</option>
-                        {# {% else %} #}
-                            <option value="0">Все категории</option>
-                        {# {% endif %} #}
+                     
+                    {% for difficulty in difficulties %}
+                        {% if selected_difficulty != difficulty.title %}
+                            <option id="{{ difficulty.title }}" value="{{ difficulty.title }}">{{ difficulty.title }}</option>
+                        {% else %}
+                             <option selected value="0">{{ selected_difficulty }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
@@ -65,16 +63,16 @@
             {% for answer in question.answers %}
             
                 <p class="d-inline-flex gap-1">
-                    <button class="btn btn-primary" style="margin-left:5px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ question.id }}_{{ answer.difficulty }}" aria-expanded="false" aria-controls="collapseExample">
-                        {% if answer.difficulty == none %}
+                    <button class="btn btn-primary" style="margin-left:5px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ question.id }}_{{ answer.difficulty.id }}" aria-expanded="false" aria-controls="collapseExample">
+                        {% if answer.difficulty.title ==  'Сложность отсутствует' %}
                             Показать ответ
                         {% else %}
-                            Показать ответ для: {{ answer.difficulty }}
+                            Показать ответ для: {{ answer.difficulty.title }}
                         {% endif %}
                         
                     </button>
                 </p>
-                <div class="collapse" id="{{ question.id }}_{{ answer.difficulty }}">
+                <div class="collapse" id="{{ question.id }}_{{ answer.difficulty.id }}">
                     <div class="card card-body">
                         {{ answer.content|safe }}
                     </div>
@@ -82,7 +80,8 @@
             {% endfor %}
 
         </div>
-        {% if question.additional != none %}
+
+        {% if (question.additional != none and question != none) %}
             <div>
                 <button class="btn btn-primary" style="margin-left:5px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ question.id }}" aria-expanded="false" aria-controls="collapseExample">
                     Показать дополнительные вопросы         
@@ -93,6 +92,8 @@
                     {{ question.additional|safe }}
                 </div>
             </div>
+        {% else %}
+            <h4>Дополнительных вопросов нет</h4>
         {% endif %}
     </div>
 {% endblock %}

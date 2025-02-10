@@ -27,7 +27,9 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
             select(self.model)
             .where(self.model.id == id)
             .options(
-                joinedload(self.model.answers),
+                joinedload(self.model.answers).options(
+                    joinedload(Answer.difficulty)
+                ),
                 joinedload(self.model.blocks),
             )
         )
@@ -40,7 +42,9 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
             select(self.model)
             .where(self.model.category_id == category_id)
             .options(
-                joinedload(self.model.answers),
+                joinedload(self.model.answers).options(
+                    joinedload(Answer.difficulty)
+                ),
                 selectinload(self.model.blocks).options(
                     joinedload(Association.block)
                 ),
@@ -51,7 +55,9 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
     async def get_multi_v2(self, session: AsyncSession) -> list[Question]:
         all_obj = await session.execute(
             select(self.model).options(
-                joinedload(self.model.answers),
+                joinedload(self.model.answers).options(
+                    joinedload(Answer.difficulty)
+                ),
                 selectinload(self.model.blocks).options(
                     joinedload(Association.block)
                 ),
@@ -98,7 +104,9 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
 
         # Добавление ответов к вопросу
         for answer in data_answer:
-            difficulty = answer.pop('difficulty')
+            difficulty = answer.pop('difficulty', None)
+            if difficulty is None:
+                difficulty = 'Сложность отсутствует'
             difficulty_in_db = await difficulty_crud.get_by_title(
                 session, title=difficulty
             )
@@ -166,10 +174,11 @@ class CRUDQuestion(CRUDBase[Question, QuestionCreate, QuestionUpdate]):
 
         if category_id is not None:
             query = query.where(self.model.category_id == category_id)
+        grade_id = await difficulty_crud.get_by_title(session, title=grade)
         if grade is not None:
             query = query.where(
                 and_(
-                    Answer.difficulty == grade,
+                    Answer.difficulty_id == grade_id.id,
                     Answer.question_id == self.model.id,
                 )
             )

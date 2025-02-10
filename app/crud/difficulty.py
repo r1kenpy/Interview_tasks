@@ -10,6 +10,10 @@ class DifficultyCRUD(CRUDBase[Difficulty, DifficultyCreate, DifficultyUpdate]):
     def __init__(self, model):
         self.model = model
 
+    async def get_multi(self, session: AsyncSession) -> list[Difficulty]:
+        all_obj = await session.execute(select(self.model).order_by('title'))
+        return all_obj.scalars().all()
+
     async def get_by_title(
         self,
         session: AsyncSession,

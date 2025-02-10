@@ -15,9 +15,9 @@
                 <div class="input-group">
                     <select class="form-select" id="difficulty" onchange="getURLForGradeQuestions()">
                     <option selected>Все грейды</option>
-                    {% for dif in difficulty %}
+                    {% for dif in difficulty%}
 
-                        <option value="{{ dif }}">{{ dif }}</option>
+                        <option value="{{ dif.title }}">{{ dif.title }}</option>
                     {% endfor %}
 
                     </select>
@@ -48,16 +48,16 @@
                     {% for answer in question.answers %}
                     
                         <p class="d-inline-flex gap-1">
-                            <button class="btn btn-primary" style="margin-left:5px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ question.id }}_{{ answer.difficulty }}" aria-expanded="false" aria-controls="collapseExample">
+                            <button class="btn btn-primary" style="margin-left:5px;" type="button" data-bs-toggle="collapse" data-bs-target="#{{ question.id }}_{{ answer.difficulty.title }}" aria-expanded="false" aria-controls="collapseExample">
                                 {% if answer.difficulty == none %}
                                     Показать ответ
                                 {% else %}
-                                  Показать ответ для: {{ answer.difficulty }}
+                                  Показать ответ для: {{ answer.difficulty.title }}
                                 {% endif %}
                                 
                             </button>
                         </p>
-                        <div class="collapse" id="{{ question.id }}_{{ answer.difficulty }}">
+                        <div class="collapse" id="{{ question.id }}_{{ answer.difficulty.title }}">
                             <div class="card card-body">
                                 {{ answer.content|safe }}
                             </div>

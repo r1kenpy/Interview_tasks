@@ -11,7 +11,7 @@ class Difficulty(BaseModel):
 
 class Answer(BaseModel):
     content: str
-    difficulty: str
+    difficulty: Optional[str] = None
 
 
 class AnswerDB(BaseModel):

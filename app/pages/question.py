@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
 from app.crud.category import category_crud
+from app.crud.difficulty import difficulty_crud
 from app.crud.question import question_crud
 
 tamplates = Jinja2Templates('app/templates')
@@ -42,16 +43,8 @@ async def index(
         questions = await question_crud.get_multi_v2(session)
 
     context['questions'] = questions
-    difficulty = set()
-    for questions in questions:
+    context['difficulty'] = await difficulty_crud.get_multi(session)
 
-        for answer in questions.answers:
-            if answer.difficulty is None:
-                difficulty.add('Сложность отсутствует')
-                continue
-            difficulty.add(answer.difficulty)
-
-    context['difficulty'] = sorted(difficulty)
     return tamplates.TemplateResponse('index.html', context)
 
 
@@ -92,7 +85,7 @@ async def random_question(
     grade: str | None = None,
     session: AsyncSession = Depends(get_async_session),
 ):
-
+    print(category_id)
     question = await question_crud.get_random_question(
         session, category_id, grade
     )
@@ -101,14 +94,13 @@ async def random_question(
         'request': request,
         'categories': await category_crud.get_multi(session),
     }
-    context['selected_category'] = None
-    if category_id != 0:
-        context['selected_category'] = question.category
-    else:
-        context['selected_category'] = None
+    context['selected_category'] = await category_crud.get_by_id(
+        session, category_id
+    )
 
     # Нужно создать таблицу difficulties и забирать уровень сложности,
     #   который присутствует в ответах определенной категории вопроса.
-    # context['difficulties'] = await difficulties_crud.get_multi(session, category_id)
+    context['difficulties'] = await difficulty_crud.get_multi(session)
+    context['selected_difficulty'] = grade
 
     return tamplates.TemplateResponse('random.html', context=context)

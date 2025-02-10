@@ -11,6 +11,10 @@ class CategoryCRUD(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
     def __init__(self, model: Category) -> None:
         self.model = model
 
+    async def get_multi(self, session: AsyncSession) -> list[Category]:
+        all_obj = await session.execute(select(self.model).order_by('title'))
+        return all_obj.scalars().all()
+
     async def get_category_by_title(
         self, session: AsyncSession, title
     ) -> Category | None:
