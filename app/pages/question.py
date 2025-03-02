@@ -28,7 +28,6 @@ async def index(
     category_id: Optional[int] = None,
     session: AsyncSession = Depends(get_async_session),
 ):
-
     all_categories = await category_crud.get_multi(session)
     context = {
         'request': request,
@@ -85,7 +84,6 @@ async def random_question(
     grade: str | None = None,
     session: AsyncSession = Depends(get_async_session),
 ):
-    print(category_id)
     question = await question_crud.get_random_question(
         session, category_id, grade
     )

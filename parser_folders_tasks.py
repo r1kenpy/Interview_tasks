@@ -1,6 +1,6 @@
+import json
 import os
 from pathlib import Path
-import json
 
 BASE_PATH = Path(__file__).parent
 TASK_LEARN = 'task_learn'
@@ -28,18 +28,21 @@ def get_all_tasks(path, folder, tasks_file) -> list[list]:
     return all_tasks
 
 
-def write_tasks(path, file_name, tasks):
+def write_tasks(path: str, file_name: str, tasks: list[list]) -> None:
     path.mkdir(exist_ok=True)
     for i in tasks:
-        with open(path / f'all_tasks_{file_name}.json', 'a', encoding='utf-8') as f:
+        with open(
+            path / f'all_tasks_{file_name}.json', 'a', encoding='utf-8'
+        ) as f:
             json.dump(i, f, ensure_ascii=False, indent=4)
 
 
-def main(path):
+def main(path) -> None:
     task_folders = get_all_folder_and_file_name(path, os.listdir(path))
     for folder, tasks_file in task_folders.items():
         all_tasks = get_all_tasks(path, folder, tasks_file)
         write_tasks(path.parent / 'all_tasks', folder, all_tasks)
 
 
-main(TASK_LEARN_PATH)
+if __name__ == '__main__':
+    main(TASK_LEARN_PATH)
